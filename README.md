@@ -6,6 +6,7 @@ unrealDice is a local-first dice application for tabletop games and quick decisi
 
 - Home navigation for all Version 1 tools
 - Quick Start read-only templates with copy-to-edit support
+- Optional Supabase-backed published Quick Start templates with built-in offline fallback
 - Saved user groups with configurable sets, colors, locked-dice counting, and combos
 - Create/Edit Group workflow with validation, confirmations, and local persistence
 - Real Play Mode with set rolls, Roll All, combo rolls, expandable dice, temporary locks, set history, and Add Combo during play
@@ -20,6 +21,7 @@ unrealDice is a local-first dice application for tabletop games and quick decisi
 - JSON backups are validated and imported as new IDs to avoid overwriting existing groups.
 - Dice results, expanded sets, and locked dice are session-only play state and are not saved into reusable group definitions.
 - PWA support uses a service worker for the application shell while user data remains in browser storage.
+- Remote template management, when configured, uses Supabase Auth and RLS; the unlinked studio route is not treated as security.
 
 ## Screenshots
 
@@ -53,6 +55,12 @@ npm run preview
 Open the preview URL in Chrome or Edge, inspect the manifest and service worker in DevTools, load the main routes once, enable offline mode, and reload a previously opened route. The normal development server is not proof of installability or offline behavior.
 
 Production hosting should serve `index.html` as the SPA fallback for app routes such as `/groups`, `/random`, and `/play/group/:groupId`.
+
+## Remote Quick Start Studio
+
+The public Quick Start screen works without Supabase by using the built-in templates. When Supabase is configured with `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY`, public users can receive published remote templates and cache the last valid published list for offline fallback.
+
+An unlinked studio route exists at `/studio/templates` for managing remote templates. Admin access depends on Supabase email/password Authentication and Row Level Security policies, not on the route being hidden. See `docs/SUPABASE_STUDIO_SETUP.md` before configuring or deploying this feature.
 
 ## Local Data And Backups
 

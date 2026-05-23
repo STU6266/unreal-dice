@@ -1,11 +1,12 @@
 import { Link } from 'react-router-dom'
 import { GroupSummaryCard } from '../components/groups/GroupSummaryCard'
 import { copy } from '../content/en'
-import { QUICK_START_TEMPLATES } from '../domain/data/quickStartTemplates'
+import { useQuickStartTemplates } from '../hooks/useQuickStartTemplates'
 import { useUserGroups } from '../hooks/useUserGroups'
 
 export function QuickStartScreen() {
   const { message, error, addCopiedTemplate } = useUserGroups()
+  const { templates, source, message: loadMessage, isLoading } = useQuickStartTemplates()
 
   return (
     <section className="list-screen" aria-labelledby="quick-start-title">
@@ -28,8 +29,20 @@ export function QuickStartScreen() {
         </div>
       ) : null}
 
+      {loadMessage ? (
+        <div className="status-message status-message--warning" role="status">
+          {copy.quickStart.remoteFallback(source)}
+        </div>
+      ) : null}
+
+      {isLoading ? (
+        <div className="status-message" role="status">
+          {copy.quickStart.loading}
+        </div>
+      ) : null}
+
       <div className="group-grid">
-        {QUICK_START_TEMPLATES.map((template) => (
+        {templates.map((template) => (
           <GroupSummaryCard
             key={template.id}
             group={template}

@@ -29,6 +29,11 @@ export const copy = {
     feedback: {
       copied: (groupName: string) => `${groupName} was added to My Groups.`,
     },
+    loading: 'Loading Quick Start templates.',
+    remoteFallback: (source: 'remote' | 'cache' | 'built-in') =>
+      source === 'cache'
+        ? 'Remote templates are unavailable. Showing the last cached templates.'
+        : 'Remote templates are unavailable. Showing built-in templates.',
     errors: {
       maxGroupsReached: 'The saved group limit has been reached. Delete a group before copying another template.',
       copyFailed: 'The template could not be copied. Please try again.',
@@ -208,7 +213,71 @@ export const copy = {
       action: 'Update now',
     },
   },
+  studio: {
+    eyebrow: 'Private studio',
+    loading: 'Loading studio.',
+    unavailable: {
+      title: 'Studio setup unavailable',
+      message:
+        'Supabase is not configured. The public app still works with built-in Quick Start templates.',
+    },
+    offline: {
+      title: 'Studio requires internet',
+      message: 'Studio management requires an internet connection.',
+    },
+    login: {
+      title: 'Studio Sign In',
+      description: 'Sign in with the configured Supabase admin account.',
+      email: 'Email',
+      password: 'Password',
+      signIn: 'Sign In',
+      signingIn: 'Signing in...',
+    },
+    templates: {
+      title: 'Quick Start Templates',
+      description: 'Manage remote public templates protected by Supabase Auth and RLS.',
+      emptyTitle: 'No remote templates visible.',
+      emptyDescription: 'Create a template or verify that the signed-in user is authorized.',
+    },
+    editor: {
+      createTitle: 'New Quick Start Template',
+      editTitle: 'Edit Quick Start Template',
+      description: 'Configure the template that can be published to public Quick Start.',
+    },
+    fields: {
+      name: 'Template name',
+      templateKey: 'Template key',
+      sortOrder: 'Display order',
+      published: 'Published',
+    },
+    status: {
+      published: 'Published',
+      hidden: 'Hidden / Draft',
+    },
+    actions: {
+      newTemplate: 'New Template',
+      edit: 'Edit',
+      publish: 'Publish',
+      unpublish: 'Unpublish',
+      delete: 'Delete',
+      signOut: 'Sign Out',
+      save: 'Save Template',
+      cancel: 'Cancel',
+    },
+    deleteDialog: {
+      title: 'Delete template',
+      message: (templateName: string) =>
+        `Delete "${templateName}"? This removes it from the public template collection.`,
+    },
+    errors: {
+      loadFailed: 'Templates could not be loaded. Check Supabase access and RLS policies.',
+      saveFailed: 'The template could not be saved.',
+      deleteFailed: 'The template could not be deleted.',
+      invalidTemplate: 'This remote template contains invalid data.',
+    },
+  },
   play: {
+    loading: 'Loading playable group.',
     eyebrow: 'Play Mode',
     notFoundTitle: 'Group not found',
     notFoundMessage: 'This playable group is not available on this device.',

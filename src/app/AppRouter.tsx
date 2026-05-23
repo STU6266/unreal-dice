@@ -11,6 +11,8 @@ import { RandomNumberScreen } from '../screens/RandomNumberScreen'
 import { PlayModeScreen } from '../screens/PlayModeScreen'
 import { InstallAppScreen } from '../screens/InstallAppScreen'
 import { NotFoundScreen } from '../screens/NotFoundScreen'
+import { StudioTemplatesScreen } from '../screens/studio/StudioTemplatesScreen'
+import { StudioTemplateEditorScreen } from '../screens/studio/StudioTemplateEditorScreen'
 
 export function AppRouter() {
   return (
@@ -36,6 +38,15 @@ export function AppRouter() {
         <Route
           path="/groups/:groupId/edit"
           element={<GroupEditorScreen mode="edit" />}
+        />
+        <Route path="/studio/templates" element={<StudioTemplatesScreen />} />
+        <Route
+          path="/studio/templates/new"
+          element={<StudioTemplateEditorScreen mode="create" />}
+        />
+        <Route
+          path="/studio/templates/:templateId/edit"
+          element={<StudioTemplateEditorScreen mode="edit" />}
         />
         <Route path="*" element={<NotFoundScreen />} />
       </Routes>
