@@ -16,7 +16,6 @@ export const copy = {
     ],
   },
   placeholders: [
-    { title: 'Coin & Random', path: '/random' },
     { title: 'Install App', path: '/install' },
   ],
   quickStart: {
@@ -118,6 +117,50 @@ export const copy = {
         `Import ${count} ${count === 1 ? 'group' : 'groups'} into My Groups? Imported groups will be saved as new editable copies on this device.`,
       confirm: 'Import',
       cancel: 'Cancel',
+    },
+  },
+  random: {
+    menu: {
+      eyebrow: 'Quick random tools',
+      title: 'Coin & Random',
+      description: 'Use a quick coin flip or generate a random number.',
+      coinAction: 'Heads / Tails',
+      maxLabel: 'Maximum number',
+      startNumber: 'Start Random Number',
+      backHome: 'Back to Home',
+      errors: {
+        max: 'Enter a whole number from 2 to 100.',
+      },
+    },
+    coin: {
+      title: 'Heads / Tails',
+      instruction: 'Tap the coin to flip. Long press or double-click to view history.',
+      tokenLabel: 'Flip coin',
+      historyAction: 'History',
+      back: 'Back to Coin & Random',
+      history: {
+        title: 'Heads / Tails History',
+        clearMessage: 'Clear Heads / Tails history? This cannot be undone.',
+      },
+    },
+    number: {
+      title: (max: number) => `Random 1-${max}`,
+      instruction: 'Tap to generate a number. Long press or double-click to view history.',
+      tokenLabel: (max: number) => `Generate random number from 1 to ${max}`,
+      historyAction: 'History',
+      back: 'Back to Coin & Random',
+      history: {
+        title: 'Random Number History',
+        range: (min: number, max: number) => `Range ${min}-${max}`,
+        clearMessage: 'Clear Random Number history? This cannot be undone.',
+      },
+    },
+    history: {
+      empty: 'No results yet.',
+      clearHistory: 'Clear History',
+      clear: 'Clear',
+      cancel: 'Cancel',
+      close: 'Close',
     },
   },
   groupEditor: {

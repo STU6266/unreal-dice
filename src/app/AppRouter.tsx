@@ -8,6 +8,9 @@ import { ImportBackupScreen } from '../screens/ImportBackupScreen'
 import { MyGroupsScreen } from '../screens/MyGroupsScreen'
 import { PlaceholderScreen } from '../screens/PlaceholderScreen'
 import { QuickStartScreen } from '../screens/QuickStartScreen'
+import { CoinRandomScreen } from '../screens/CoinRandomScreen'
+import { CoinFlipScreen } from '../screens/CoinFlipScreen'
+import { RandomNumberScreen } from '../screens/RandomNumberScreen'
 
 export function AppRouter() {
   return (
@@ -18,6 +21,9 @@ export function AppRouter() {
         <Route path="/groups" element={<MyGroupsScreen />} />
         <Route path="/groups/new" element={<GroupEditorScreen mode="create" />} />
         <Route path="/import" element={<ImportBackupScreen />} />
+        <Route path="/random" element={<CoinRandomScreen />} />
+        <Route path="/random/coin" element={<CoinFlipScreen />} />
+        <Route path="/random/number" element={<RandomNumberScreen />} />
         <Route
           path="/play/quick-start/:groupId"
           element={<GroupFeaturePlaceholderScreen mode="play-quick-start" />}

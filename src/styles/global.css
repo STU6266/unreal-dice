@@ -819,6 +819,146 @@ p {
   justify-content: center;
 }
 
+.random-menu-screen,
+.random-mode-screen {
+  width: 100%;
+}
+
+.random-mode-screen {
+  display: grid;
+  gap: 26px;
+  justify-items: center;
+  text-align: center;
+}
+
+.random-menu-panel {
+  width: min(100%, 620px);
+  display: grid;
+  gap: 16px;
+  margin: 0 auto;
+}
+
+.random-number-setup {
+  display: grid;
+  gap: 14px;
+  padding: 18px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: rgba(23, 27, 38, 0.9);
+}
+
+.result-token {
+  width: min(72vw, 260px);
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  border: 3px solid rgba(250, 204, 21, 0.75);
+  border-radius: 50%;
+  color: #10131b;
+  background:
+    radial-gradient(circle at 35% 28%, rgba(255, 255, 255, 0.95), transparent 18%),
+    linear-gradient(145deg, #fef3c7, #facc15 52%, #d97706);
+  box-shadow:
+    0 20px 50px rgba(0, 0, 0, 0.35),
+    inset 0 0 0 10px rgba(255, 255, 255, 0.2);
+  font-family: var(--font-display);
+  font-size: clamp(2.3rem, 12vw, 4.2rem);
+  font-weight: 900;
+  cursor: pointer;
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease;
+  user-select: none;
+  touch-action: manipulation;
+}
+
+.result-token:hover {
+  transform: translateY(-2px);
+}
+
+.result-token:disabled {
+  cursor: wait;
+}
+
+.result-token--moving {
+  animation: token-flip 420ms ease-in-out;
+}
+
+.random-mode-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+}
+
+.random-history-dialog {
+  width: min(100%, 520px);
+}
+
+.random-history-empty {
+  color: var(--color-muted);
+}
+
+.random-history-list {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.random-history-list li {
+  display: grid;
+  gap: 4px;
+  padding: 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: rgba(8, 10, 16, 0.42);
+  text-align: left;
+}
+
+.random-history-list strong {
+  color: var(--color-text);
+  font-size: 1.15rem;
+}
+
+.random-history-list span,
+.random-history-list time {
+  color: var(--color-muted);
+  font-size: 0.9rem;
+}
+
+.inline-confirmation {
+  display: grid;
+  gap: 12px;
+  padding: 12px;
+  border: 1px solid rgba(251, 113, 133, 0.6);
+  border-radius: 8px;
+  background: rgba(244, 63, 94, 0.12);
+}
+
+@keyframes token-flip {
+  0% {
+    transform: rotateY(0deg) scale(1);
+  }
+
+  50% {
+    transform: rotateY(90deg) scale(0.96);
+  }
+
+  100% {
+    transform: rotateY(0deg) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .result-token,
+  .result-token--moving {
+    animation: none;
+    transition: none;
+  }
+}
+
 @media (min-width: 680px) {
   .app-shell {
     padding: 40px 24px;
