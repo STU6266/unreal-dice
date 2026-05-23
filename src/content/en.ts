@@ -16,7 +16,6 @@ export const copy = {
     ],
   },
   placeholders: [
-    { title: 'Import Backup', path: '/import' },
     { title: 'Coin & Random', path: '/random' },
     { title: 'Install App', path: '/install' },
   ],
@@ -59,10 +58,12 @@ export const copy = {
       play: 'Play',
       edit: 'Edit',
       export: 'Export',
+      exportAll: 'Export All Groups',
       delete: 'Delete',
       backHome: 'Back to Home',
     },
-    exportUnavailableLabel: 'Export will be available in a later phase.',
+    exportGroupLabel: (groupName: string) => `Export ${groupName}`,
+    exportAllLabel: 'Export all saved groups',
     deleteDialog: {
       title: 'Delete saved group',
       message: (groupName: string) =>
@@ -72,7 +73,51 @@ export const copy = {
     },
     feedback: {
       deleted: 'The saved group was deleted.',
-      exportUnavailable: 'Export will be available in a later phase.',
+      exported: (fileName: string) => `${fileName} was created.`,
+    },
+  },
+  backup: {
+    exportDialog: {
+      titleSingle: 'Export Group',
+      titleAll: 'Export All Groups',
+      messageSingle: (groupName: string) =>
+        `Export "${groupName}" as a JSON backup file?`,
+      messageAll: (count: number) =>
+        `Export ${count} saved ${count === 1 ? 'group' : 'groups'} as one JSON backup file?`,
+      confirm: 'Export',
+      cancel: 'Cancel',
+    },
+    importScreen: {
+      eyebrow: 'Local JSON backup',
+      title: 'Import Backup',
+      description: 'Choose an unrealDice backup file to import saved groups.',
+      warning:
+        'unrealDice stores your groups locally on this device. Your data can be lost if browser data is cleared, the app is removed, private browsing is used, or the device is reset. Export a backup if your saved groups are important to you.',
+      fileLabel: 'Backup JSON file',
+      fileHint: 'Choose an unrealDice backup file to import saved groups.',
+      validMessage: (count: number, exportType: string) =>
+        `Valid ${exportType} backup with ${count} ${count === 1 ? 'group' : 'groups'} found.`,
+      success: (count: number) =>
+        `${count} imported ${count === 1 ? 'group was' : 'groups were'} added to My Groups.`,
+      actions: {
+        import: 'Import',
+        back: 'Back to Home',
+        myGroups: 'Go to My Groups',
+      },
+      errors: {
+        readFailed: 'The selected file could not be read.',
+        noValidBackup: 'Choose a valid backup before importing.',
+        maxGroupsReached:
+          'There is not enough room to import all groups. Delete saved groups first.',
+        saveFailed: 'The imported groups could not be saved.',
+      },
+    },
+    importConfirm: {
+      title: 'Import Backup',
+      message: (count: number) =>
+        `Import ${count} ${count === 1 ? 'group' : 'groups'} into My Groups? Imported groups will be saved as new editable copies on this device.`,
+      confirm: 'Import',
+      cancel: 'Cancel',
     },
   },
   groupEditor: {

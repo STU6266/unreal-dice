@@ -329,6 +329,11 @@ p {
   background: rgba(244, 63, 94, 0.14);
 }
 
+.list-toolbar {
+  display: flex;
+  justify-content: center;
+}
+
 .group-grid {
   display: grid;
   grid-template-columns: 1fr;
@@ -756,6 +761,62 @@ p {
   margin: 0;
   padding-left: 20px;
   color: var(--color-muted);
+}
+
+.import-screen {
+  max-width: 760px;
+  margin: 0 auto;
+}
+
+.backup-warning,
+.import-panel {
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: rgba(23, 27, 38, 0.9);
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.2);
+}
+
+.backup-warning {
+  padding: 16px;
+  color: var(--color-muted);
+}
+
+.import-panel {
+  display: grid;
+  gap: 16px;
+  padding: 18px;
+}
+
+.field input[type="file"] {
+  padding: 12px;
+}
+
+.backup-status {
+  padding: 12px 14px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  color: var(--color-muted);
+  background: rgba(8, 10, 16, 0.45);
+}
+
+.backup-status--valid,
+.backup-status--success {
+  border-color: rgba(134, 239, 172, 0.55);
+  color: var(--color-text);
+  background: rgba(34, 197, 94, 0.11);
+}
+
+.backup-status--invalid {
+  border-color: rgba(251, 113, 133, 0.6);
+  color: #fecdd3;
+  background: rgba(244, 63, 94, 0.14);
+}
+
+.import-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
 }
 
 @media (min-width: 680px) {

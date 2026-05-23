@@ -46,17 +46,13 @@ export function useUserGroups() {
     [groups],
   )
 
-  const showExportUnavailable = useCallback((): void => {
-    setMessage(copy.myGroups.feedback.exportUnavailable)
-    setError(null)
-  }, [])
-
   return {
     groups,
     message,
     error,
+    setMessage,
+    setError,
     addCopiedTemplate,
     deleteGroup,
-    showExportUnavailable,
   }
 }

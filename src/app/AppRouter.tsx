@@ -4,6 +4,7 @@ import { copy } from '../content/en'
 import { GroupFeaturePlaceholderScreen } from '../screens/GroupFeaturePlaceholderScreen'
 import { GroupEditorScreen } from '../screens/GroupEditorScreen'
 import { HomeScreen } from '../screens/HomeScreen'
+import { ImportBackupScreen } from '../screens/ImportBackupScreen'
 import { MyGroupsScreen } from '../screens/MyGroupsScreen'
 import { PlaceholderScreen } from '../screens/PlaceholderScreen'
 import { QuickStartScreen } from '../screens/QuickStartScreen'
@@ -16,6 +17,7 @@ export function AppRouter() {
         <Route path="/quick-start" element={<QuickStartScreen />} />
         <Route path="/groups" element={<MyGroupsScreen />} />
         <Route path="/groups/new" element={<GroupEditorScreen mode="create" />} />
+        <Route path="/import" element={<ImportBackupScreen />} />
         <Route
           path="/play/quick-start/:groupId"
           element={<GroupFeaturePlaceholderScreen mode="play-quick-start" />}

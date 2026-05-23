@@ -79,7 +79,7 @@ export function GroupSummaryCard({
             className="button-link"
             type="button"
             onClick={onExport}
-            aria-label={copy.myGroups.exportUnavailableLabel}
+            aria-label={copy.myGroups.exportGroupLabel(group.name)}
           >
             {copy.myGroups.actions.export}
           </button>

@@ -1,17 +1,28 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import { ExportDialog } from '../components/backup/ExportDialog'
 import { ConfirmDeleteDialog } from '../components/groups/ConfirmDeleteDialog'
 import { GroupSummaryCard } from '../components/groups/GroupSummaryCard'
 import { copy } from '../content/en'
 import type { DiceGroup } from '../domain/types/groups'
 import { useUserGroups } from '../hooks/useUserGroups'
+import {
+  createBackup,
+  createBackupFilename,
+  downloadBackup,
+} from '../services/backupService'
+
+type ExportTarget =
+  | { type: 'single'; group: DiceGroup }
+  | { type: 'all' }
 
 export function MyGroupsScreen() {
-  const { groups, message, error, deleteGroup, showExportUnavailable } =
+  const { groups, message, error, setMessage, setError, deleteGroup } =
     useUserGroups()
   const [groupPendingDelete, setGroupPendingDelete] = useState<DiceGroup | null>(
     null,
   )
+  const [exportTarget, setExportTarget] = useState<ExportTarget | null>(null)
 
   function confirmDelete(): void {
     if (groupPendingDelete === null) {
@@ -20,6 +31,26 @@ export function MyGroupsScreen() {
 
     deleteGroup(groupPendingDelete.id)
     setGroupPendingDelete(null)
+  }
+
+  function confirmExport(): void {
+    if (exportTarget === null) {
+      return
+    }
+
+    const isSingleExport = exportTarget.type === 'single'
+    const exportGroups = isSingleExport ? [exportTarget.group] : groups
+    const fileName = isSingleExport
+      ? createBackupFilename(exportTarget.group.name)
+      : 'unrealdice-all-groups.json'
+
+    downloadBackup(
+      createBackup(exportGroups, isSingleExport ? 'single-group' : 'all-groups'),
+      fileName,
+    )
+    setMessage(copy.myGroups.feedback.exported(fileName))
+    setError(null)
+    setExportTarget(null)
   }
 
   return (
@@ -56,18 +87,30 @@ export function MyGroupsScreen() {
           </div>
         </div>
       ) : (
-        <div className="group-grid">
-          {groups.map((group) => (
-            <GroupSummaryCard
-              key={group.id}
-              group={group}
-              playTo={`/play/group/${group.id}`}
-              editTo={`/groups/${group.id}/edit`}
-              onExport={showExportUnavailable}
-              onDelete={() => setGroupPendingDelete(group)}
-            />
-          ))}
-        </div>
+        <>
+          <div className="list-toolbar">
+            <button
+              className="button-link button-link--primary"
+              type="button"
+              aria-label={copy.myGroups.exportAllLabel}
+              onClick={() => setExportTarget({ type: 'all' })}
+            >
+              {copy.myGroups.actions.exportAll}
+            </button>
+          </div>
+          <div className="group-grid">
+            {groups.map((group) => (
+              <GroupSummaryCard
+                key={group.id}
+                group={group}
+                playTo={`/play/group/${group.id}`}
+                editTo={`/groups/${group.id}/edit`}
+                onExport={() => setExportTarget({ type: 'single', group })}
+                onDelete={() => setGroupPendingDelete(group)}
+              />
+            ))}
+          </div>
+        </>
       )}
 
       <Link className="text-link" to="/">
@@ -79,6 +122,15 @@ export function MyGroupsScreen() {
           groupName={groupPendingDelete.name}
           onCancel={() => setGroupPendingDelete(null)}
           onConfirm={confirmDelete}
+        />
+      ) : null}
+
+      {exportTarget ? (
+        <ExportDialog
+          groupName={exportTarget.type === 'single' ? exportTarget.group.name : undefined}
+          groupCount={exportTarget.type === 'single' ? 1 : groups.length}
+          onCancel={() => setExportTarget(null)}
+          onConfirm={confirmExport}
         />
       ) : null}
     </section>
