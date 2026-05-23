@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { Link, useNavigate, useParams } from 'react-router-dom'
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { ComboEditorDialog } from '../components/groups/ComboEditorDialog'
 import { ComboSummaryCard } from '../components/groups/ComboSummaryCard'
 import { GroupHelpDialog } from '../components/groups/GroupHelpDialog'
@@ -10,7 +10,9 @@ import { copy } from '../content/en'
 import { APP_LIMITS } from '../domain/constants/limits'
 import type { DiceCombo, DiceSet } from '../domain/types/dice'
 import type { DiceGroup } from '../domain/types/groups'
+import type { GroupPlaySession } from '../domain/types/session'
 import { deleteCombo, removeSetFromCombos } from '../domain/utils/comboFactory'
+import { reconcilePlaySession } from '../domain/utils/sessionReconciliation'
 import {
   addEmptySlot,
   areGroupDraftsEqual,
@@ -47,7 +49,11 @@ interface PendingConfirmation {
 
 export function GroupEditorScreen({ mode }: GroupEditorScreenProps) {
   const navigate = useNavigate()
+  const location = useLocation()
   const { groupId } = useParams()
+  const playReturnState = location.state as
+    | { fromPlay?: boolean; playSession?: GroupPlaySession; previousGroup?: DiceGroup }
+    | null
   const savedGroups = useMemo(() => loadUserGroups(), [])
   const existingGroup =
     mode === 'edit' ? savedGroups.find((group) => group.id === groupId) : undefined
@@ -239,7 +245,21 @@ export function GroupEditorScreen({ mode }: GroupEditorScreenProps) {
 
     try {
       saveUserGroups(nextGroups)
-      navigate(target === 'play' ? `/play/group/${group.id}` : '/groups')
+      const playState =
+        target === 'play' && playReturnState?.playSession && playReturnState.previousGroup
+          ? {
+              playSession: reconcilePlaySession(
+                playReturnState.playSession,
+                playReturnState.previousGroup,
+                group,
+              ),
+              previousGroup: group,
+            }
+          : undefined
+
+      navigate(target === 'play' ? `/play/group/${group.id}` : '/groups', {
+        state: playState,
+      })
     } catch {
       setSaveError(copy.groupEditor.errors.saveFailed)
     }
@@ -248,6 +268,20 @@ export function GroupEditorScreen({ mode }: GroupEditorScreenProps) {
   function requestCancel(): void {
     if (hasUnsavedChanges) {
       setPendingConfirmation({ kind: 'discard-unsaved' })
+      return
+    }
+
+    navigateAfterCancel()
+  }
+
+  function navigateAfterCancel(): void {
+    if (playReturnState?.fromPlay && playReturnState.playSession && playReturnState.previousGroup) {
+      navigate(`/play/group/${playReturnState.previousGroup.id}`, {
+        state: {
+          playSession: playReturnState.playSession,
+          previousGroup: playReturnState.previousGroup,
+        },
+      })
       return
     }
 
@@ -260,7 +294,7 @@ export function GroupEditorScreen({ mode }: GroupEditorScreenProps) {
     }
 
     if (pendingConfirmation.kind === 'discard-unsaved') {
-      navigate('/groups')
+      navigateAfterCancel()
     }
 
     if (

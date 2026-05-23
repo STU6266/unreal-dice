@@ -1,7 +1,6 @@
 import { Route, Routes } from 'react-router-dom'
 import { AppShell } from '../components/layout/AppShell'
 import { copy } from '../content/en'
-import { GroupFeaturePlaceholderScreen } from '../screens/GroupFeaturePlaceholderScreen'
 import { GroupEditorScreen } from '../screens/GroupEditorScreen'
 import { HomeScreen } from '../screens/HomeScreen'
 import { ImportBackupScreen } from '../screens/ImportBackupScreen'
@@ -11,6 +10,7 @@ import { QuickStartScreen } from '../screens/QuickStartScreen'
 import { CoinRandomScreen } from '../screens/CoinRandomScreen'
 import { CoinFlipScreen } from '../screens/CoinFlipScreen'
 import { RandomNumberScreen } from '../screens/RandomNumberScreen'
+import { PlayModeScreen } from '../screens/PlayModeScreen'
 
 export function AppRouter() {
   return (
@@ -26,11 +26,11 @@ export function AppRouter() {
         <Route path="/random/number" element={<RandomNumberScreen />} />
         <Route
           path="/play/quick-start/:groupId"
-          element={<GroupFeaturePlaceholderScreen mode="play-quick-start" />}
+          element={<PlayModeScreen source="quick-start" />}
         />
         <Route
           path="/play/group/:groupId"
-          element={<GroupFeaturePlaceholderScreen mode="play-group" />}
+          element={<PlayModeScreen source="saved" />}
         />
         <Route
           path="/groups/:groupId/edit"

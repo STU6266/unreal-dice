@@ -163,6 +163,46 @@ export const copy = {
       close: 'Close',
     },
   },
+  play: {
+    notFoundTitle: 'Group not found',
+    notFoundMessage: 'This playable group is not available on this device.',
+    actions: {
+      rollAll: 'Roll All',
+      rollAllTotal: (total: number) => `Roll All · Total ${total}`,
+      rollSet: (setName: string) => `Roll ${setName}`,
+      comboTotal: (comboName: string, total: number) => `${comboName} · Total ${total}`,
+      setMenu: 'Set Menu',
+      backQuickStart: 'Back to Quick Start',
+      backMyGroups: 'Back to My Groups',
+      addComboLater: 'Add Combo · Coming next',
+      groupSetup: 'Group Setup',
+      copyToEditLater: 'Copy to Edit · Coming later',
+      copyToEdit: 'Copy to Edit',
+      history: 'History',
+      setSetup: 'Set Setup',
+      close: 'Close',
+      clearHistory: 'Clear History',
+      clear: 'Clear',
+      cancel: 'Cancel',
+    },
+    setAction: {
+      title: (setName: string) => `${setName} Actions`,
+    },
+    history: {
+      title: (setName: string) => `${setName} History`,
+      empty: 'No rolls yet.',
+      total: (total: number) => `Total ${total}`,
+      included: 'Locked dice included',
+      excluded: 'Locked dice excluded',
+      clearMessage: (setName: string) =>
+        `Clear history for "${setName}"? This cannot be undone.`,
+    },
+    labels: {
+      toggleSet: (setName: string) => `Expand or collapse ${setName} dice`,
+      toggleDie: (setName: string, dieNumber: number, locked: boolean) =>
+        `${locked ? 'Unlock' : 'Lock'} ${setName} die ${dieNumber}`,
+    },
+  },
   groupEditor: {
     createTitle: 'Create Group',
     editTitle: 'Edit Group',
