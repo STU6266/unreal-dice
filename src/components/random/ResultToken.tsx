@@ -4,6 +4,7 @@ interface ResultTokenProps {
   label: string
   result: string | null
   isAnimating: boolean
+  variant?: 'coin' | 'number'
   onPress: () => void
   onHistory: () => void
 }
@@ -12,6 +13,7 @@ export function ResultToken({
   label,
   result,
   isAnimating,
+  variant = 'number',
   onPress,
   onHistory,
 }: ResultTokenProps) {
@@ -29,7 +31,17 @@ export function ResultToken({
       disabled={isAnimating}
       {...pressHandlers}
     >
-      <span>{result ?? ''}</span>
+      {variant === 'coin' && result !== null ? (
+        <>
+          <span
+            className={`result-token__coin-face result-token__coin-face--${result.toLowerCase()}`}
+            aria-hidden="true"
+          />
+          <span className="sr-only">{result}</span>
+        </>
+      ) : (
+        <span>{result ?? ''}</span>
+      )}
     </button>
   )
 }

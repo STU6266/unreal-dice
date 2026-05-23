@@ -67,9 +67,6 @@ export function RandomNumberScreen() {
       />
 
       <div className="random-mode-actions">
-        <button className="button-link" type="button" onClick={() => setIsHistoryOpen(true)}>
-          {copy.random.number.historyAction}
-        </button>
         <Link className="button-link" to="/random">
           {copy.random.number.back}
         </Link>

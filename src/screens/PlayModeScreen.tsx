@@ -2,7 +2,6 @@ import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { ComboEditorDialog } from '../components/groups/ComboEditorDialog'
 import { ComboRollButton } from '../components/play/ComboRollButton'
 import { RollAllButton } from '../components/play/RollAllButton'
-import { SetActionDialog } from '../components/play/SetActionDialog'
 import { SetHistoryDialog } from '../components/play/SetHistoryDialog'
 import { SetPlayTile } from '../components/play/SetPlayTile'
 import { copy } from '../content/en'
@@ -96,7 +95,6 @@ function LoadedPlayMode({
     | { playSession?: GroupPlaySession; previousGroup?: DiceGroup }
     | null
   const [activeGroup, setActiveGroup] = useState(group)
-  const [activeSetId, setActiveSetId] = useState<string | null>(null)
   const [historySetId, setHistorySetId] = useState<string | null>(null)
   const [historyEntries, setHistoryEntries] = useState<SetHistoryEntry[]>([])
   const [isAddingCombo, setIsAddingCombo] = useState(false)
@@ -109,10 +107,6 @@ function LoadedPlayMode({
     toggleDieLocked,
   } = usePlaySession(activeGroup, routeState?.playSession)
 
-  const activeSet =
-    activeSetId === null
-      ? undefined
-      : activeGroup.sets.find((set) => set.id === activeSetId)
   const historySet =
     historySetId === null
       ? undefined
@@ -121,6 +115,7 @@ function LoadedPlayMode({
   return (
     <section className="play-screen" aria-labelledby="play-title">
       <h1 id="play-title">{activeGroup.name}</h1>
+      <p className="play-screen__hint">{copy.play.historyHint}</p>
 
       <div className="play-set-grid">
         {activeGroup.sets.map((set) => {
@@ -131,13 +126,19 @@ function LoadedPlayMode({
             return null
           }
 
+          const comboForSet = activeGroup.combos.find((combo) =>
+            combo.setIds.includes(set.id),
+          )
+
           return (
             <SetPlayTile
               key={set.id}
               set={set}
               state={setState}
+              comboName={comboForSet?.name}
+              comboColor={comboForSet?.color}
               onToggleExpanded={() => toggleSetExpanded(set.id)}
-              onOpenMenu={() => setActiveSetId(set.id)}
+              onOpenMenu={() => openHistory(set.id)}
               onRoll={() => rollSingleSet(set.id)}
               onToggleDieLocked={(dieIndex) => toggleDieLocked(set.id, dieIndex)}
             />
@@ -205,21 +206,6 @@ function LoadedPlayMode({
         </div>
       </section>
 
-      {activeSet ? (
-        <SetActionDialog
-          setName={activeSet.name}
-          source={source}
-          onHistory={() => openHistory(activeSet.id)}
-          onSetSetup={() =>
-            navigate(`/groups/${activeGroup.id}/edit`, {
-              state: { fromPlay: true, playSession: session, previousGroup: activeGroup },
-            })
-          }
-          onCopyToEdit={copyQuickStartToEdit}
-          onClose={() => setActiveSetId(null)}
-        />
-      ) : null}
-
       {historySet ? (
         <SetHistoryDialog
           setName={historySet.name}
@@ -245,7 +231,6 @@ function LoadedPlayMode({
   )
 
   function openHistory(setId: string): void {
-    setActiveSetId(null)
     setHistorySetId(setId)
     setHistoryEntries(loadSetHistory(setId))
   }

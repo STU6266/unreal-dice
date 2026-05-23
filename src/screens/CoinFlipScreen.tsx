@@ -52,14 +52,12 @@ export function CoinFlipScreen() {
         label={copy.random.coin.tokenLabel}
         result={result}
         isAnimating={isAnimating}
+        variant="coin"
         onPress={flipCoin}
         onHistory={() => setIsHistoryOpen(true)}
       />
 
       <div className="random-mode-actions">
-        <button className="button-link" type="button" onClick={() => setIsHistoryOpen(true)}>
-          {copy.random.coin.historyAction}
-        </button>
         <Link className="button-link" to="/random">
           {copy.random.coin.back}
         </Link>

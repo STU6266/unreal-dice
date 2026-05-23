@@ -138,7 +138,6 @@ export const copy = {
       title: 'Heads / Tails',
       instruction: 'Tap the coin to flip. Long press or double-click to view history.',
       tokenLabel: 'Flip coin',
-      historyAction: 'History',
       back: 'Back to Coin & Random',
       history: {
         title: 'Heads / Tails History',
@@ -149,7 +148,6 @@ export const copy = {
       title: (max: number) => `Random 1-${max}`,
       instruction: 'Tap to generate a number. Long press or double-click to view history.',
       tokenLabel: (max: number) => `Generate random number from 1 to ${max}`,
-      historyAction: 'History',
       back: 'Back to Coin & Random',
       history: {
         title: 'Random Number History',
@@ -279,6 +277,7 @@ export const copy = {
   play: {
     loading: 'Loading playable group.',
     eyebrow: 'Play Mode',
+    historyHint: 'Double-click or long press a set die to view its history.',
     notFoundTitle: 'Group not found',
     notFoundMessage: 'This playable group is not available on this device.',
     actions: {
@@ -286,21 +285,16 @@ export const copy = {
       rollAllTotal: (total: number) => `Roll All · Total ${total}`,
       rollSet: (setName: string) => `Roll ${setName}`,
       comboTotal: (comboName: string, total: number) => `${comboName} · Total ${total}`,
-      setMenu: 'Set Menu',
       backQuickStart: 'Back to Quick Start',
       backMyGroups: 'Back to My Groups',
       copyBeforeCombos: 'Copy this template before adding combos',
       groupSetup: 'Group Setup',
       copyToEdit: 'Copy to Edit',
-      history: 'History',
       setSetup: 'Set Setup',
       close: 'Close',
       clearHistory: 'Clear History',
       clear: 'Clear',
       cancel: 'Cancel',
-    },
-    setAction: {
-      title: (setName: string) => `${setName} Actions`,
     },
     history: {
       title: (setName: string) => `${setName} History`,

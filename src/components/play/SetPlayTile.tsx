@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react'
 import { copy } from '../../content/en'
 import type { DiceSet } from '../../domain/types/dice'
 import type { SetPlayState } from '../../domain/types/session'
@@ -7,6 +8,8 @@ import { LargeResultDie } from './LargeResultDie'
 interface SetPlayTileProps {
   set: DiceSet
   state: SetPlayState
+  comboName?: string
+  comboColor?: string
   onToggleExpanded: () => void
   onOpenMenu: () => void
   onRoll: () => void
@@ -16,19 +19,33 @@ interface SetPlayTileProps {
 export function SetPlayTile({
   set,
   state,
+  comboName,
+  comboColor,
   onToggleExpanded,
   onOpenMenu,
   onRoll,
   onToggleDieLocked,
 }: SetPlayTileProps) {
   const hasLockedDice = state.diceResults.some((die) => die.locked)
+  const comboStyle =
+    comboColor === undefined
+      ? undefined
+      : ({ '--combo-color': comboColor } as CSSProperties)
   const diceForDisplay =
     state.diceResults.length > 0
       ? state.diceResults
       : Array.from({ length: set.diceCount }, () => null)
 
   return (
-    <article className={`set-play-tile${state.isExpanded ? ' set-play-tile--expanded' : ''}`}>
+    <article
+      className={[
+        'set-play-tile',
+        state.isExpanded ? 'set-play-tile--expanded' : '',
+        comboColor ? 'set-play-tile--combo' : '',
+      ].join(' ')}
+      style={comboStyle}
+    >
+      {comboName ? <span className="set-play-tile__combo-badge">{comboName}</span> : null}
       <h2>{set.name}</h2>
       <LargeResultDie
         total={state.total}
@@ -40,9 +57,6 @@ export function SetPlayTile({
         onToggleExpanded={onToggleExpanded}
         onOpenMenu={onOpenMenu}
       />
-      <button className="set-menu-button" type="button" onClick={onOpenMenu}>
-        {copy.play.actions.setMenu}
-      </button>
       <button className="button-link button-link--primary" type="button" onClick={onRoll}>
         {copy.play.actions.rollSet(set.name)}
       </button>
