@@ -1,73 +1,52 @@
-# React + TypeScript + Vite
+# unrealDice
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+unrealDice is a local-first dice application for tabletop games and quick decisions. It is built as a responsive React portfolio project with saved dice groups, configurable sets and combos, backup import/export, Coin & Random tools, real Play Mode, and offline-capable PWA support.
 
-Currently, two official plugins are available:
+## Current Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- Quick Start read-only dice templates
+- Saved user groups with configurable sets, colors, locked-dice counting, and combos
+- Real Play Mode with set rolls, Roll All, combo rolls, expandable dice, and temporary locks
+- Per-set roll history and local Coin & Random histories
+- Safe JSON export/import for saved group backups
+- Install App / Offline Help screen and production PWA configuration
 
-## React Compiler
+## Tech Stack
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- React
+- TypeScript
+- Vite
+- React Router
+- Vitest
+- vite-plugin-pwa
+- localStorage-backed services for saved local data
 
-## Expanding the ESLint configuration
+## Local Development
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm install
+npm run dev
+npm run test
+npm run lint
+npm run build
+npm run preview
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## PWA Testing
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+Production PWA behavior should be tested after:
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm run build
+npm run preview
 ```
+
+The normal development server is for development feedback and should not be used as proof of installability or offline behavior.
+
+## Local Data
+
+User groups and histories are stored locally in the current browser/device. They can be lost if browser data is cleared, the app is removed, private browsing is used, or the device is reset. Export backups to protect saved group configurations.
+
+## Future Enhancements
+
+Optional German UI translation and possible later mobile packaging may be added after final polish.

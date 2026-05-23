@@ -15,9 +15,7 @@ export const copy = {
       { label: 'Install App', path: '/install' },
     ],
   },
-  placeholders: [
-    { title: 'Install App', path: '/install' },
-  ],
+  placeholders: [],
   quickStart: {
     eyebrow: 'Read-only templates',
     title: 'Quick Start',
@@ -161,6 +159,54 @@ export const copy = {
       clear: 'Clear',
       cancel: 'Cancel',
       close: 'Close',
+    },
+  },
+  install: {
+    eyebrow: 'Offline app',
+    title: 'Install unrealDice',
+    description: 'Install unrealDice on your device for quick access and offline use.',
+    status: {
+      installed: 'unrealDice is installed on this device.',
+      promptAvailable: 'Your browser can install unrealDice on this device.',
+      manual: 'Use the instructions below to add unrealDice to your device.',
+    },
+    actions: {
+      install: 'Install App',
+      backHome: 'Back to Home',
+    },
+    instructions: [
+      {
+        title: 'Android / Chrome',
+        steps: [
+          'Open unrealDice in Chrome.',
+          'Open the browser menu.',
+          'Choose Install app or Add to Home screen.',
+          'Open unrealDice from your home screen once while online.',
+        ],
+      },
+      {
+        title: 'iPhone / Safari',
+        steps: [
+          'Open unrealDice in Safari.',
+          'Tap the Share button.',
+          'Choose Add to Home Screen.',
+          'Open unrealDice from your home screen once while online.',
+        ],
+      },
+      {
+        title: 'Desktop',
+        steps: [
+          'Open unrealDice in a compatible browser.',
+          'Use the install icon or browser install option when shown.',
+          'Launch unrealDice like a normal app.',
+        ],
+      },
+    ],
+    offlineWarning:
+      'After unrealDice has been loaded and cached, core app features can work offline. Your saved groups and histories are stored locally on this device/browser. They can be lost if you clear browser data, remove the app, use private browsing, or reset the device. Export backups for groups you want to protect.',
+    update: {
+      message: 'A new version of unrealDice is available.',
+      action: 'Update now',
     },
   },
   play: {
