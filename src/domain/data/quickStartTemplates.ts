@@ -15,6 +15,8 @@ type ReadonlyQuickStartGroup = Omit<
   readonly combos: readonly ReadonlyDiceCombo[]
 }
 
+export type QuickStartTemplate = ReadonlyQuickStartGroup
+
 const TEMPLATE_TIMESTAMP = '2026-01-01T00:00:00.000Z'
 
 function createTemplateSet(

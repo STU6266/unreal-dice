@@ -66,6 +66,15 @@ a:focus-visible {
   outline-offset: 4px;
 }
 
+button {
+  font: inherit;
+}
+
+button:focus-visible {
+  outline: 3px solid var(--color-accent-strong);
+  outline-offset: 4px;
+}
+
 button,
 a {
   -webkit-tap-highlight-color: transparent;
@@ -89,7 +98,8 @@ a {
 }
 
 .home-screen,
-.placeholder-screen {
+.placeholder-screen,
+.list-screen {
   width: 100%;
 }
 
@@ -223,7 +233,8 @@ p {
   color: var(--color-muted);
 }
 
-.text-link {
+.text-link,
+.button-link {
   justify-self: center;
   min-height: 44px;
   display: inline-flex;
@@ -236,14 +247,190 @@ p {
   background: rgba(125, 211, 252, 0.08);
   font-weight: 800;
   text-decoration: none;
+  cursor: pointer;
   transition:
     transform 160ms ease,
     background-color 160ms ease;
 }
 
-.text-link:hover {
+.text-link:hover,
+.button-link:hover {
   background: rgba(125, 211, 252, 0.16);
   transform: translateY(-1px);
+}
+
+.button-link--primary {
+  border-color: var(--color-accent);
+  background: rgba(125, 211, 252, 0.18);
+}
+
+.button-link--danger {
+  border-color: #fda4af;
+  background: rgba(244, 63, 94, 0.13);
+}
+
+.button-link--danger:hover {
+  background: rgba(244, 63, 94, 0.22);
+}
+
+.list-screen {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.screen-heading {
+  display: grid;
+  gap: 10px;
+  text-align: center;
+}
+
+.screen-heading h1 {
+  font-family: var(--font-body);
+  font-size: 2.45rem;
+  line-height: 1.05;
+}
+
+.screen-heading p:not(.eyebrow) {
+  max-width: 42rem;
+  margin: 0 auto;
+  color: var(--color-muted);
+}
+
+.status-message {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 14px;
+  border: 1px solid rgba(125, 211, 252, 0.45);
+  border-radius: 8px;
+  background: rgba(125, 211, 252, 0.11);
+  color: var(--color-text);
+  text-align: center;
+}
+
+.status-message a {
+  color: var(--color-accent);
+  font-weight: 800;
+}
+
+.status-message--error {
+  border-color: rgba(251, 113, 133, 0.6);
+  background: rgba(244, 63, 94, 0.14);
+}
+
+.group-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+}
+
+.group-card,
+.empty-state,
+.confirm-dialog {
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.015)),
+    rgba(23, 27, 38, 0.94);
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.22);
+}
+
+.group-card {
+  display: grid;
+  gap: 16px;
+  padding: 18px;
+}
+
+.group-card__header {
+  display: grid;
+  gap: 12px;
+}
+
+.group-card h2,
+.empty-state h2,
+.confirm-dialog h2 {
+  margin: 0;
+  color: var(--color-text);
+  font-size: 1.2rem;
+  line-height: 1.2;
+}
+
+.group-card__header p {
+  margin-top: 4px;
+  color: var(--color-muted);
+  font-size: 0.92rem;
+}
+
+.group-card__badge {
+  width: fit-content;
+  padding: 6px 9px;
+  border: 1px solid rgba(250, 204, 21, 0.38);
+  border-radius: 8px;
+  color: #fde68a;
+  background: rgba(250, 204, 21, 0.09);
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.group-card__meta {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  color: var(--color-muted);
+  list-style: none;
+}
+
+.group-card__actions,
+.empty-state__actions,
+.confirm-dialog__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.group-card__actions .button-link,
+.empty-state__actions .button-link,
+.confirm-dialog__actions .button-link {
+  justify-self: auto;
+}
+
+.empty-state {
+  display: grid;
+  gap: 14px;
+  padding: 22px;
+  text-align: center;
+}
+
+.empty-state p,
+.confirm-dialog p {
+  color: var(--color-muted);
+}
+
+.empty-state__actions,
+.confirm-dialog__actions {
+  justify-content: center;
+}
+
+.dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  display: grid;
+  place-items: center;
+  padding: 18px;
+  background: rgba(8, 10, 16, 0.76);
+}
+
+.confirm-dialog {
+  width: min(100%, 420px);
+  display: grid;
+  gap: 16px;
+  padding: 22px;
+  text-align: center;
 }
 
 @media (min-width: 680px) {
@@ -269,5 +456,18 @@ p {
 
   .placeholder-panel h1 {
     font-size: 3rem;
+  }
+
+  .screen-heading h1 {
+    font-size: 3.3rem;
+  }
+
+  .group-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .group-card__header {
+    grid-template-columns: 1fr auto;
+    align-items: start;
   }
 }
