@@ -116,11 +116,12 @@ export function SetEditorDialog({
             ) : null}
           </label>
 
-          <label className="field field--color">
-            <span>{copy.groupEditor.setDialog.fields.diceColor}</span>
+          <div className="field field--color">
+            <span id="dice-color-label">{copy.groupEditor.setDialog.fields.diceColor}</span>
             <input
               type="color"
               value={input.diceColor}
+              aria-labelledby="dice-color-label"
               aria-describedby={errors.diceColor ? 'dice-color-error' : undefined}
               onChange={(event) => updateInput('diceColor', event.target.value)}
             />
@@ -129,13 +130,14 @@ export function SetEditorDialog({
                 {errors.diceColor}
               </small>
             ) : null}
-          </label>
+          </div>
 
-          <label className="field field--color">
-            <span>{copy.groupEditor.setDialog.fields.pipColor}</span>
+          <div className="field field--color">
+            <span id="pip-color-label">{copy.groupEditor.setDialog.fields.pipColor}</span>
             <input
               type="color"
               value={input.pipColor}
+              aria-labelledby="pip-color-label"
               aria-describedby={errors.pipColor ? 'pip-color-error' : undefined}
               onChange={(event) => updateInput('pipColor', event.target.value)}
             />
@@ -144,7 +146,7 @@ export function SetEditorDialog({
                 {errors.pipColor}
               </small>
             ) : null}
-          </label>
+          </div>
         </div>
 
         {hasLowContrast ? (

@@ -52,7 +52,7 @@ export function SetHistoryDialog({
                 <div className="history-dice-row">
                   {entry.diceResults.map((die, index) => (
                     <span key={index} className="history-die">
-                      {die.value}
+                      {die.value === 0 ? '—' : die.value}
                       {die.locked ? <em>X</em> : null}
                     </span>
                   ))}

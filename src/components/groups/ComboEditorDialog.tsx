@@ -137,11 +137,12 @@ export function ComboEditorDialog({
             ) : null}
           </label>
 
-          <label className="field field--color">
-            <span>{copy.groupEditor.comboDialog.fields.color}</span>
+          <div className="field field--color">
+            <span id="combo-color-label">{copy.groupEditor.comboDialog.fields.color}</span>
             <input
               type="color"
               value={input.color}
+              aria-labelledby="combo-color-label"
               aria-describedby={errors.color ? 'combo-color-error' : undefined}
               onChange={(event) =>
                 setInput((current) => ({ ...current, color: event.target.value }))
@@ -152,7 +153,7 @@ export function ComboEditorDialog({
                 {errors.color}
               </small>
             ) : null}
-          </label>
+          </div>
         </div>
 
         <fieldset className="combo-set-picker">

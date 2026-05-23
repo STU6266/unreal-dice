@@ -24,6 +24,7 @@ export function IndividualDie({
 }: IndividualDieProps) {
   const longPressTimerRef = useRef<number | null>(null)
   const pointerStartRef = useRef<{ x: number; y: number } | null>(null)
+  const isUnrolled = value === null || value === 0
 
   function clearLongPressTimer(): void {
     if (longPressTimerRef.current !== null) {
@@ -32,16 +33,14 @@ export function IndividualDie({
     }
   }
 
-  function toggleIfRolled(): void {
-    if (value !== null) {
-      onToggleLocked()
-    }
+  function toggleLock(): void {
+    onToggleLocked()
   }
 
   function handlePointerDown(event: PointerEvent<HTMLButtonElement>): void {
     pointerStartRef.current = { x: event.clientX, y: event.clientY }
     clearLongPressTimer()
-    longPressTimerRef.current = window.setTimeout(toggleIfRolled, LONG_PRESS_DELAY_MS)
+    longPressTimerRef.current = window.setTimeout(toggleLock, LONG_PRESS_DELAY_MS)
   }
 
   function handlePointerMove(event: PointerEvent<HTMLButtonElement>): void {
@@ -68,7 +67,7 @@ export function IndividualDie({
   function handleKeyDown(event: KeyboardEvent<HTMLButtonElement>): void {
     if (event.key === 'Enter' || event.key === ' ') {
       event.preventDefault()
-      toggleIfRolled()
+      toggleLock()
     }
   }
 
@@ -78,16 +77,15 @@ export function IndividualDie({
       type="button"
       aria-label={label}
       aria-pressed={locked}
-      disabled={value === null}
       style={{ backgroundColor: diceColor, color: pipColor, borderColor: pipColor }}
-      onDoubleClick={toggleIfRolled}
+      onDoubleClick={toggleLock}
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerEnd}
       onPointerCancel={handlePointerEnd}
       onKeyDown={handleKeyDown}
     >
-      {value === null ? null : sides >= 2 && sides <= 6 ? (
+      {isUnrolled ? null : sides >= 2 && sides <= 6 ? (
         <span className={`pip-face pip-face--${value}`}>
           {Array.from({ length: value }, (_, index) => (
             <span key={index} className="pip-dot" />

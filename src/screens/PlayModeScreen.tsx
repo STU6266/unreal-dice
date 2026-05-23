@@ -1,6 +1,7 @@
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { ComboEditorDialog } from '../components/groups/ComboEditorDialog'
 import { ComboRollButton } from '../components/play/ComboRollButton'
+import { PlayHelpDialog } from '../components/play/PlayHelpDialog'
 import { RollAllButton } from '../components/play/RollAllButton'
 import { SetHistoryDialog } from '../components/play/SetHistoryDialog'
 import { SetPlayTile } from '../components/play/SetPlayTile'
@@ -98,6 +99,7 @@ function LoadedPlayMode({
   const [historySetId, setHistorySetId] = useState<string | null>(null)
   const [historyEntries, setHistoryEntries] = useState<SetHistoryEntry[]>([])
   const [isAddingCombo, setIsAddingCombo] = useState(false)
+  const [isHelpOpen, setIsHelpOpen] = useState(false)
   const {
     session,
     toggleSetExpanded,
@@ -115,7 +117,6 @@ function LoadedPlayMode({
   return (
     <section className="play-screen" aria-labelledby="play-title">
       <h1 id="play-title">{activeGroup.name}</h1>
-      <p className="play-screen__hint">{copy.play.historyHint}</p>
 
       <div className="play-set-grid">
         {activeGroup.sets.map((set) => {
@@ -135,7 +136,6 @@ function LoadedPlayMode({
               key={set.id}
               set={set}
               state={setState}
-              comboName={comboForSet?.name}
               comboColor={comboForSet?.color}
               onToggleExpanded={() => toggleSetExpanded(set.id)}
               onOpenMenu={() => openHistory(set.id)}
@@ -178,6 +178,9 @@ function LoadedPlayMode({
           </Link>
           {source === 'saved' ? (
             <>
+              <button className="button-link" type="button" onClick={() => setIsHelpOpen(true)}>
+                {copy.play.actions.help}
+              </button>
               <button className="button-link" type="button" onClick={() => setIsAddingCombo(true)}>
                 {copy.groupEditor.actions.addCombo}
               </button>
@@ -195,6 +198,9 @@ function LoadedPlayMode({
             </>
           ) : (
             <>
+              <button className="button-link" type="button" onClick={() => setIsHelpOpen(true)}>
+                {copy.play.actions.help}
+              </button>
               <button className="button-link" type="button" disabled>
                 {copy.play.actions.copyBeforeCombos}
               </button>
@@ -217,6 +223,8 @@ function LoadedPlayMode({
           onClose={() => setHistorySetId(null)}
         />
       ) : null}
+
+      {isHelpOpen ? <PlayHelpDialog onClose={() => setIsHelpOpen(false)} /> : null}
 
       {isAddingCombo && source === 'saved' ? (
         <ComboEditorDialog

@@ -116,11 +116,19 @@ export function usePlaySession(
   function toggleDieLocked(setId: string, dieIndex: number): void {
     setSession((current) => {
       const setState = current.setStates[setId]
-      const die = setState?.diceResults[dieIndex]
+      const set = group.sets.find((item) => item.id === setId)
 
-      if (setState === undefined || die === undefined) {
+      if (setState === undefined || set === undefined || dieIndex >= set.diceCount) {
         return current
       }
+
+      const diceResults =
+        setState.diceResults.length > 0
+          ? setState.diceResults
+          : Array.from({ length: set.diceCount }, () => ({
+              value: 0,
+              locked: false,
+            }))
 
       return {
         ...current,
@@ -128,7 +136,7 @@ export function usePlaySession(
           ...current.setStates,
           [setId]: {
             ...setState,
-            diceResults: setState.diceResults.map((currentDie, index) =>
+            diceResults: diceResults.map((currentDie, index) =>
               index === dieIndex
                 ? { ...currentDie, locked: !currentDie.locked }
                 : currentDie,

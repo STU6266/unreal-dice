@@ -8,7 +8,6 @@ import { LargeResultDie } from './LargeResultDie'
 interface SetPlayTileProps {
   set: DiceSet
   state: SetPlayState
-  comboName?: string
   comboColor?: string
   onToggleExpanded: () => void
   onOpenMenu: () => void
@@ -19,7 +18,6 @@ interface SetPlayTileProps {
 export function SetPlayTile({
   set,
   state,
-  comboName,
   comboColor,
   onToggleExpanded,
   onOpenMenu,
@@ -45,7 +43,6 @@ export function SetPlayTile({
       ].join(' ')}
       style={comboStyle}
     >
-      {comboName ? <span className="set-play-tile__combo-badge">{comboName}</span> : null}
       <h2>{set.name}</h2>
       <LargeResultDie
         total={state.total}

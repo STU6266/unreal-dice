@@ -80,6 +80,28 @@ describe('diceEngine', () => {
     expect(nextState.diceResults[0]?.value).toBe(4)
   })
 
+  it('a die locked before the first roll stays unrolled', () => {
+    const previousState = {
+      setId: 'set-1',
+      isExpanded: true,
+      total: null,
+      diceResults: [
+        { value: 0, locked: true },
+        { value: 0, locked: false },
+      ],
+    }
+    const nextState = rollSet(
+      createTestSet({ id: 'set-1', diceCount: 2, sides: 6 }),
+      previousState,
+      'include',
+      () => 0.5,
+    )
+
+    expect(nextState.diceResults[0]).toEqual({ value: 0, locked: true })
+    expect(nextState.diceResults[1]?.value).toBe(4)
+    expect(nextState.total).toBe(4)
+  })
+
   it('an unlocked die is rerolled', () => {
     const previousState = {
       setId: 'set-1',

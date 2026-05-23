@@ -277,7 +277,6 @@ export const copy = {
   play: {
     loading: 'Loading playable group.',
     eyebrow: 'Play Mode',
-    historyHint: 'Double-click or long press a set die to view its history.',
     notFoundTitle: 'Group not found',
     notFoundMessage: 'This playable group is not available on this device.',
     actions: {
@@ -290,6 +289,7 @@ export const copy = {
       copyBeforeCombos: 'Copy this template before adding combos',
       groupSetup: 'Group Setup',
       copyToEdit: 'Copy to Edit',
+      help: 'Help',
       setSetup: 'Set Setup',
       close: 'Close',
       clearHistory: 'Clear History',
@@ -304,6 +304,20 @@ export const copy = {
       excluded: 'Locked dice excluded',
       clearMessage: (setName: string) =>
         `Clear history for "${setName}"? This cannot be undone.`,
+    },
+    help: {
+      title: 'Play Help',
+      items: [
+        'Tap a large set die to expand or collapse its individual dice.',
+        'Press a set Roll button to roll only that set.',
+        'Use Roll All to roll every set in the group.',
+        'Use combo buttons to roll only the sets that belong to that combo.',
+        'Double-click or long press a large set die to open that set history.',
+        'Expand a set, then double-click or long press an individual die to lock or unlock it.',
+        'Individual dice can be locked before the first roll. Locked empty dice stay unrolled until unlocked.',
+        'Locked dice keep their current value during later rolls.',
+        'Whether locked dice count toward totals depends on this group’s Locked Dice Counting setting.',
+      ],
     },
     labels: {
       toggleSet: (setName: string) => `Expand or collapse ${setName} dice`,
