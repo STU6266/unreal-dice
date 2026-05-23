@@ -329,6 +329,12 @@ p {
   background: rgba(244, 63, 94, 0.14);
 }
 
+.status-message--warning {
+  border-color: rgba(250, 204, 21, 0.62);
+  background: rgba(250, 204, 21, 0.12);
+  color: #fde68a;
+}
+
 .list-toolbar {
   display: flex;
   justify-content: center;

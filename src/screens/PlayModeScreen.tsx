@@ -33,7 +33,7 @@ export function PlayModeScreen({ source }: PlayModeScreenProps) {
     return (
       <section className="placeholder-screen" aria-labelledby="play-not-found-title">
         <div className="placeholder-panel">
-          <p className="eyebrow">{copy.groupFeaturePlaceholder.playEyebrow}</p>
+          <p className="eyebrow">{copy.play.eyebrow}</p>
           <h1 id="play-not-found-title">{copy.play.notFoundTitle}</h1>
           <p>{copy.play.notFoundMessage}</p>
           <Link className="text-link" to={source === 'quick-start' ? '/quick-start' : '/groups'}>
@@ -155,13 +155,13 @@ function LoadedPlayMode({
                   })
                 }
               >
-              {copy.play.actions.groupSetup}
+                {copy.play.actions.groupSetup}
               </button>
             </>
           ) : (
             <>
               <button className="button-link" type="button" disabled>
-                {copy.play.actions.addComboLater}
+                {copy.play.actions.copyBeforeCombos}
               </button>
               <button className="button-link" type="button" onClick={copyQuickStartToEdit}>
                 {copy.play.actions.copyToEdit}

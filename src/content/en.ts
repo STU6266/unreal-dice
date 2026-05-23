@@ -15,11 +15,10 @@ export const copy = {
       { label: 'Install App', path: '/install' },
     ],
   },
-  placeholders: [],
   quickStart: {
     eyebrow: 'Read-only templates',
     title: 'Quick Start',
-    description: 'Copy a built-in dice group into My Groups, or open its future Play Mode placeholder.',
+    description: 'Play a built-in dice group or copy it into My Groups for editing.',
     setsLabel: (count: number) => `${count} ${count === 1 ? 'set' : 'sets'}`,
     actions: {
       play: 'Play',
@@ -210,6 +209,7 @@ export const copy = {
     },
   },
   play: {
+    eyebrow: 'Play Mode',
     notFoundTitle: 'Group not found',
     notFoundMessage: 'This playable group is not available on this device.',
     actions: {
@@ -220,9 +220,8 @@ export const copy = {
       setMenu: 'Set Menu',
       backQuickStart: 'Back to Quick Start',
       backMyGroups: 'Back to My Groups',
-      addComboLater: 'Add Combo · Coming next',
+      copyBeforeCombos: 'Copy this template before adding combos',
       groupSetup: 'Group Setup',
-      copyToEditLater: 'Copy to Edit · Coming later',
       copyToEdit: 'Copy to Edit',
       history: 'History',
       setSetup: 'Set Setup',
@@ -369,6 +368,8 @@ export const copy = {
         pipColor: 'Number / dot color',
       },
       optionalNameHint: 'Optional. A default name is used if this is empty.',
+      contrastWarning:
+        'These colors may be difficult to read together. Choose stronger contrast if this set will be used often.',
       errors: {
         diceCount: (max: number) => `Enter an integer from 1 to ${max}.`,
         sides: (min: number, max: number) => `Enter an integer from ${min} to ${max}.`,
@@ -379,21 +380,14 @@ export const copy = {
       cancel: 'Cancel',
     },
   },
-  groupFeaturePlaceholder: {
-    playEyebrow: 'Play Mode',
-    editEyebrow: 'Group Editor',
-    playQuickStartMessage: 'Play Mode for this Quick Start template will be implemented in a later phase.',
-    playGroupMessage: 'Play Mode for this saved group will be implemented in a later phase.',
-    editGroupMessage: 'The Group Editor will be implemented in the next phase.',
-    missingGroupTitle: 'Group not found',
-    missingGroupMessage: 'This group is not available on this device.',
-    back: 'Back',
-  },
   lockedDiceCountingLabels: {
     include: 'Locked dice included in total',
     exclude: 'Locked dice excluded from total',
   },
-  laterPhase: 'Later phase',
-  placeholderMessage: 'This feature will be implemented in a later phase.',
+  notFound: {
+    eyebrow: 'Route not found',
+    title: 'Nothing here',
+    message: 'This page does not exist in unrealDice.',
+  },
   backToHome: 'Back to Home',
 } as const

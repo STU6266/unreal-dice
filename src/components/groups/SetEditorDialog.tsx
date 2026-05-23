@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { copy } from '../../content/en'
 import { APP_LIMITS } from '../../domain/constants/limits'
 import type { DiceSet } from '../../domain/types/dice'
+import { hasReadableColorContrast } from '../../domain/utils/colorContrast'
 import {
   createEmptySetInput,
   createSetFromInput,
@@ -33,6 +34,7 @@ export function SetEditorDialog({
     set ? createSetInputFromSet(set) : createEmptySetInput(),
   )
   const [errors, setErrors] = useState<SetEditorErrors>({})
+  const hasLowContrast = !hasReadableColorContrast(input.pipColor, input.diceColor)
 
   function updateInput<Key extends keyof SetInput>(
     key: Key,
@@ -144,6 +146,12 @@ export function SetEditorDialog({
             ) : null}
           </label>
         </div>
+
+        {hasLowContrast ? (
+          <div className="status-message status-message--warning" role="status">
+            {copy.groupEditor.setDialog.contrastWarning}
+          </div>
+        ) : null}
 
         <div className="confirm-dialog__actions">
           <button className="button-link" type="button" onClick={onCancel}>

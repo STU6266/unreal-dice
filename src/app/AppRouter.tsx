@@ -10,6 +10,7 @@ import { CoinFlipScreen } from '../screens/CoinFlipScreen'
 import { RandomNumberScreen } from '../screens/RandomNumberScreen'
 import { PlayModeScreen } from '../screens/PlayModeScreen'
 import { InstallAppScreen } from '../screens/InstallAppScreen'
+import { NotFoundScreen } from '../screens/NotFoundScreen'
 
 export function AppRouter() {
   return (
@@ -36,6 +37,7 @@ export function AppRouter() {
           path="/groups/:groupId/edit"
           element={<GroupEditorScreen mode="edit" />}
         />
+        <Route path="*" element={<NotFoundScreen />} />
       </Routes>
     </AppShell>
   )
