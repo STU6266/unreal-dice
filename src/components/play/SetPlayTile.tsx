@@ -26,11 +26,12 @@ export function SetPlayTile({
   onRoll,
   onToggleDieLocked,
 }: SetPlayTileProps) {
+  const hasEachDieModifier = set.modifier.enabled && set.modifier.application === 'each-die'
+  const hasSetTotalModifier = set.modifier.enabled && set.modifier.application === 'set-total'
   const hasLockedDice = state.diceResults.some((die) => normalizeDieMode(die) === 'locked')
   const hasActiveModifier =
-    (set.modifier.enabled &&
-      set.modifier.application === 'set-total' &&
-      state.setModifierActive) ||
+    (hasSetTotalModifier && state.setModifierActive) ||
+    (hasEachDieModifier && state.diceResults.length === 0) ||
     state.diceResults.some((die) => normalizeDieMode(die) === 'modifier-active')
   const comboStyle =
     comboColor === undefined
@@ -41,6 +42,17 @@ export function SetPlayTile({
       ? state.diceResults
       : Array.from({ length: set.diceCount }, () => null)
   const isSingleDieSet = set.diceCount === 1
+  const modifierSummary = set.modifier.enabled
+    ? set.modifier.application === 'each-die'
+      ? copy.groupEditor.setDialog.modifierSummary.eachDie(
+          copy.groupEditor.setDialog.operators[set.modifier.operator],
+          set.modifier.value,
+        )
+      : copy.groupEditor.setDialog.modifierSummary.setTotal(
+          copy.groupEditor.setDialog.operators[set.modifier.operator],
+          set.modifier.value,
+        )
+    : null
 
   return (
     <article
@@ -66,24 +78,53 @@ export function SetPlayTile({
           set.name
         )}
       </h2>
-      {isSingleDieSet ? null : (
-        <LargeResultDie
-          total={state.total}
-          diceColor={set.diceColor}
-          pipColor={set.pipColor}
-          isExpanded={state.isExpanded}
-          hasLockedDice={hasLockedDice}
-          hasActiveModifier={hasActiveModifier}
-          label={copy.play.labels.toggleSet(set.name, getLargeDieState(hasActiveModifier, hasLockedDice))}
-          onToggleExpanded={onToggleExpanded}
-          onOpenMenu={onOpenMenu}
-        />
+      {isSingleDieSet ? (
+        <>
+          <div className="individual-dice-grid">
+            {diceForDisplay.map((die, index) => (
+              <IndividualDie
+                key={index}
+                value={die?.value ?? null}
+                sides={set.sides}
+                diceColor={set.diceColor}
+                pipColor={set.pipColor}
+                mode={getDisplayMode(die, hasEachDieModifier)}
+                label={copy.play.labels.toggleDie(
+                  set.name,
+                  index + 1,
+                  getDisplayMode(die, hasEachDieModifier),
+                )}
+                onToggleLocked={() => onToggleDieLocked(index)}
+              />
+            ))}
+          </div>
+          {modifierSummary === null ? null : (
+            <span className="set-modifier-summary">{modifierSummary}</span>
+          )}
+        </>
+      ) : (
+        <div className="set-result-stack">
+          <LargeResultDie
+            total={state.total}
+            diceColor={set.diceColor}
+            pipColor={set.pipColor}
+            isExpanded={state.isExpanded}
+            hasLockedDice={hasLockedDice}
+            hasActiveModifier={hasActiveModifier}
+            label={copy.play.labels.toggleSet(set.name, getLargeDieState(hasActiveModifier, hasLockedDice))}
+            onToggleExpanded={onToggleExpanded}
+            onOpenMenu={onOpenMenu}
+          />
+          {modifierSummary === null ? null : (
+            <span className="set-modifier-summary">{modifierSummary}</span>
+          )}
+        </div>
       )}
       <button className="button-link button-link--primary" type="button" onClick={onRoll}>
         {copy.play.actions.rollSet(set.name)}
       </button>
 
-      {state.isExpanded || isSingleDieSet ? (
+      {state.isExpanded && !isSingleDieSet ? (
         <div className="individual-dice-grid">
           {diceForDisplay.map((die, index) => (
             <IndividualDie
@@ -92,8 +133,12 @@ export function SetPlayTile({
               sides={set.sides}
               diceColor={set.diceColor}
               pipColor={set.pipColor}
-              mode={getDisplayMode(die)}
-              label={copy.play.labels.toggleDie(set.name, index + 1, getDisplayMode(die))}
+              mode={getDisplayMode(die, hasEachDieModifier)}
+              label={copy.play.labels.toggleDie(
+                set.name,
+                index + 1,
+                getDisplayMode(die, hasEachDieModifier),
+              )}
               onToggleLocked={() => onToggleDieLocked(index)}
             />
           ))}
@@ -103,8 +148,15 @@ export function SetPlayTile({
   )
 }
 
-function getDisplayMode(die: { mode?: unknown; locked?: unknown } | null): IndividualDieMode {
-  return die === null ? 'normal' : normalizeDieMode(die)
+function getDisplayMode(
+  die: { mode?: unknown; locked?: unknown } | null,
+  hasEachDieModifier: boolean,
+): IndividualDieMode {
+  if (die === null) {
+    return hasEachDieModifier ? 'modifier-active' : 'normal'
+  }
+
+  return normalizeDieMode(die)
 }
 
 function getLargeDieState(hasActiveModifier: boolean, hasLockedDice: boolean) {

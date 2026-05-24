@@ -81,6 +81,10 @@ export function rollSet(
   const diceResults: IndividualDieResult[] = Array.from({ length: set.diceCount }, (_, index) => {
     const previousDie = previousResults[index]
     const previousMode = normalizeDieMode(previousDie)
+    const shouldStartModifierActive =
+      set.modifier.enabled &&
+      set.modifier.application === 'each-die' &&
+      previousDie === undefined
 
     if (previousMode === 'locked') {
       return { value: previousDie?.value ?? 0, mode: 'locked' }
@@ -90,7 +94,7 @@ export function rollSet(
       value: rollDie(set.sides, random),
       mode:
         set.modifier.enabled && set.modifier.application === 'each-die'
-          ? previousMode === 'normal'
+          ? previousMode === 'normal' && !shouldStartModifierActive
             ? 'normal'
             : 'modifier-active'
           : 'normal',

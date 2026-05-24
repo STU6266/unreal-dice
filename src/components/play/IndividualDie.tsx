@@ -1,4 +1,4 @@
-import { useRef, type KeyboardEvent, type PointerEvent } from 'react'
+import { useRef, type CSSProperties, type KeyboardEvent, type PointerEvent } from 'react'
 import type { IndividualDieMode } from '../../domain/types/history'
 
 interface IndividualDieProps {
@@ -27,6 +27,12 @@ export function IndividualDie({
   const pointerStartRef = useRef<{ x: number; y: number } | null>(null)
   const isUnrolled = value === null || value === 0
   const isLocked = mode === 'locked'
+  const dieStyle = {
+    backgroundColor: diceColor,
+    color: pipColor,
+    borderColor: pipColor,
+    '--die-color': diceColor,
+  } as CSSProperties
 
   function clearLongPressTimer(): void {
     if (longPressTimerRef.current !== null) {
@@ -83,7 +89,7 @@ export function IndividualDie({
       type="button"
       aria-label={label}
       aria-pressed={mode !== 'normal'}
-      style={{ backgroundColor: diceColor, color: pipColor, borderColor: pipColor }}
+      style={dieStyle}
       onDoubleClick={toggleLock}
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}

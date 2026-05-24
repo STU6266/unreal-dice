@@ -52,6 +52,21 @@ describe('diceEngine', () => {
     expect(state.diceResults.every((die) => die.mode === 'normal')).toBe(true)
   })
 
+  it('initial each-die modifier roll keeps every die modifier-active', () => {
+    const state = rollSet(
+      createTestSet({ diceCount: 2, modifier: eachDieMultiplyModifier }),
+      undefined,
+      'include',
+      createRandomSequence([0, 0.5]),
+    )
+
+    expect(state.diceResults.map((die) => die.mode)).toEqual([
+      'modifier-active',
+      'modifier-active',
+    ])
+    expect(state.total).toBe(10)
+  })
+
   it('total is correct for an unlocked set', () => {
     const state = rollSet(
       createTestSet({ diceCount: 2, sides: 6 }),
