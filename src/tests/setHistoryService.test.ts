@@ -28,7 +28,7 @@ class InMemoryStorage implements UserGroupsStorage {
 function createEntry(index: number, setId = 'set-1') {
   return createSetHistoryEntry(
     createTestSet({ id: setId, name: `Set ${setId}` }),
-    [{ value: index, locked: index % 2 === 0 }],
+    [{ value: index, mode: index % 2 === 0 ? 'locked' : 'normal' }],
     'exclude',
     index,
     () => `entry-${index}`,
@@ -86,14 +86,14 @@ describe('setHistoryService', () => {
   it('history entry preserves locked die flags, locked counting, and total', () => {
     const entry = createSetHistoryEntry(
       createTestSet({ id: 'set-1' }),
-      [{ value: 6, locked: true }],
+      [{ value: 6, mode: 'locked' }],
       'include',
       6,
       () => 'entry-1',
       () => '2026-05-23T10:00:00.000Z',
     )
 
-    expect(entry.diceResults[0]?.locked).toBe(true)
+    expect(entry.diceResults[0]?.mode).toBe('locked')
     expect(entry.lockedDiceCounting).toBe('include')
     expect(entry.total).toBe(6)
   })

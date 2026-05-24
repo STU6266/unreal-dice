@@ -18,7 +18,8 @@ export function reconcilePlaySession(
       previousSet !== undefined &&
       previousState !== undefined &&
       previousSet.diceCount === nextSet.diceCount &&
-      previousSet.sides === nextSet.sides
+      previousSet.sides === nextSet.sides &&
+      JSON.stringify(previousSet.modifier) === JSON.stringify(nextSet.modifier)
     ) {
       setStates[nextSet.id] = {
         ...previousState,

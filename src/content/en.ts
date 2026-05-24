@@ -290,6 +290,9 @@ export const copy = {
       groupSetup: 'Group Setup',
       copyToEdit: 'Copy to Edit',
       help: 'Help',
+      modifierSetup: 'Modifier Setup',
+      turnModifierOn: 'Turn Modifier On',
+      turnModifierOff: 'Turn Modifier Off',
       setSetup: 'Set Setup',
       close: 'Close',
       clearHistory: 'Clear History',
@@ -302,6 +305,7 @@ export const copy = {
       total: (total: number) => `Total ${total}`,
       included: 'Locked dice included',
       excluded: 'Locked dice excluded',
+      modifierOff: 'Modifier off',
       clearMessage: (setName: string) =>
         `Clear history for "${setName}"? This cannot be undone.`,
     },
@@ -313,6 +317,7 @@ export const copy = {
         'Use Roll All to roll every set in the group.',
         'Use combo buttons to roll only the sets that belong to that combo.',
         'Double-click or long press a large set die to open that set history.',
+        'For sets with one die, use the set name to open that set menu.',
         'Expand a set, then double-click or long press an individual die to lock or unlock it.',
         'Individual dice can be locked before the first roll. Locked empty dice stay unrolled until unlocked.',
         'Locked dice keep their current value during later rolls.',
@@ -320,9 +325,11 @@ export const copy = {
       ],
     },
     labels: {
-      toggleSet: (setName: string) => `Expand or collapse ${setName} dice`,
-      toggleDie: (setName: string, dieNumber: number, locked: boolean) =>
-        `${locked ? 'Unlock' : 'Lock'} ${setName} die ${dieNumber}`,
+      toggleSet: (setName: string, state: string) =>
+        `Expand or collapse ${setName} dice. Current set state: ${state}.`,
+      toggleDie: (setName: string, dieNumber: number, mode: string) =>
+        `Cycle ${setName} die ${dieNumber}. Current state: ${mode}.`,
+      openSetMenu: (setName: string) => `Open ${setName} set menu.`,
     },
   },
   groupEditor: {
@@ -443,6 +450,24 @@ export const copy = {
         sides: 'Sides per die',
         diceColor: 'Dice body color',
         pipColor: 'Number / dot color',
+        enableModifier: 'Enable Modifier',
+        modifierOperator: 'Modifier operation',
+        modifierValue: 'Modifier value',
+        modifierApplication: 'Apply modifier',
+        eachDie: 'Each Die',
+        setTotal: 'Set Total',
+      },
+      modifierHelp:
+        'Apply a modifier to each die separately or once to the set total. Division rounds up.',
+      modifierSummary: {
+        eachDie: (operator: string, value: number) => `${operator}${value} each die`,
+        setTotal: (operator: string, value: number) => `${operator}${value} on total`,
+      },
+      operators: {
+        add: '+',
+        subtract: '-',
+        multiply: '×',
+        divide: '÷',
       },
       optionalNameHint: 'Optional. A default name is used if this is empty.',
       contrastWarning:
@@ -452,6 +477,7 @@ export const copy = {
         sides: (min: number, max: number) => `Enter an integer from ${min} to ${max}.`,
         diceColor: 'Choose a dice body color.',
         pipColor: 'Choose a number / dot color.',
+        modifierValue: 'Enter an integer from 1 to 100.',
       },
       save: 'Save Set',
       cancel: 'Cancel',

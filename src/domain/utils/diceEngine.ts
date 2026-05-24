@@ -2,6 +2,12 @@ import type { DiceSet, LockedDiceCounting } from '../types/dice'
 import type { DiceGroup } from '../types/groups'
 import type { IndividualDieResult } from '../types/history'
 import type { GroupPlaySession, SetPlayState } from '../types/session'
+import {
+  applyModifier,
+  isLockedDie,
+  isModifierActiveDie,
+  normalizeDieMode,
+} from './modifierUtils'
 
 export type RandomNumberGenerator = () => number
 
@@ -13,12 +19,12 @@ export function rollDie(
 }
 
 export function calculateSetTotal(
-  diceResults: readonly IndividualDieResult[],
+  diceResults: readonly (IndividualDieResult | { value: number; locked: boolean })[],
   modifier: number,
   lockedDiceCounting: LockedDiceCounting,
 ): number {
   const diceTotal = diceResults.reduce((total, die) => {
-    if (die.locked && lockedDiceCounting === 'exclude') {
+    if (isLockedDie(die) && lockedDiceCounting === 'exclude') {
       return total
     }
 
@@ -28,6 +34,39 @@ export function calculateSetTotal(
   return diceTotal + modifier
 }
 
+export function calculateModifiedSetTotal(
+  diceResults: readonly IndividualDieResult[],
+  set: DiceSet,
+  lockedDiceCounting: LockedDiceCounting,
+  setModifierActive: boolean,
+): number {
+  const baseTotal = diceResults.reduce((total, die) => {
+    if (isLockedDie(die) && lockedDiceCounting === 'exclude') {
+      return total
+    }
+
+    if (
+      set.modifier.enabled &&
+      set.modifier.application === 'each-die' &&
+      isModifierActiveDie(die)
+    ) {
+      return total + applyModifier(die.value, set.modifier)
+    }
+
+    return total + die.value
+  }, 0)
+
+  if (
+    set.modifier.enabled &&
+    set.modifier.application === 'set-total' &&
+    setModifierActive
+  ) {
+    return applyModifier(baseTotal, set.modifier)
+  }
+
+  return baseTotal
+}
+
 export function rollSet(
   set: DiceSet,
   previousState: SetPlayState | undefined,
@@ -35,28 +74,40 @@ export function rollSet(
   random: RandomNumberGenerator = Math.random,
 ): SetPlayState {
   const previousResults = previousState?.diceResults ?? []
-  const diceResults = Array.from({ length: set.diceCount }, (_, index) => {
+  const setModifierActive =
+    set.modifier.enabled && set.modifier.application === 'set-total'
+      ? (previousState?.setModifierActive ?? true)
+      : false
+  const diceResults: IndividualDieResult[] = Array.from({ length: set.diceCount }, (_, index) => {
     const previousDie = previousResults[index]
+    const previousMode = normalizeDieMode(previousDie)
 
-    if (previousDie?.locked) {
-      return previousDie
+    if (previousMode === 'locked') {
+      return { value: previousDie?.value ?? 0, mode: 'locked' }
     }
 
     return {
       value: rollDie(set.sides, random),
-      locked: false,
+      mode:
+        set.modifier.enabled && set.modifier.application === 'each-die'
+          ? previousMode === 'normal'
+            ? 'normal'
+            : 'modifier-active'
+          : 'normal',
     }
   })
-  const total = calculateSetTotal(
+  const total = calculateModifiedSetTotal(
     diceResults,
-    set.modifier,
+    set,
     lockedDiceCounting,
+    setModifierActive,
   )
 
   return {
     setId: set.id,
     isExpanded: previousState?.isExpanded ?? false,
     diceResults,
+    setModifierActive,
     total,
   }
 }

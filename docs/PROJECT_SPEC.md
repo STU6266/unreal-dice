@@ -377,9 +377,21 @@ Do not automatically assign different colors to sets.
 
 ### Modifier
 
-Do not expose a modifier feature in the Version 1 UI.
+Version 1.2 exposes optional modifiers for sets.
 
-The TypeScript model may reserve a `modifier: 0` property so modifiers can be added later without redesigning saved data.
+A modifier can be disabled or configured with:
+
+- operator: add, subtract, multiply, or divide
+- integer value from 1 to 100
+- application: each die or set total
+
+Each Die modifiers can be toggled per individual die during Play Mode. Dice cycle through modifier-active, normal, and locked states. A die cannot be locked and modifier-active at the same time.
+
+Set Total modifiers apply once after locked-dice counting has produced the base set total. They can be turned on or off for the current play session from the set action menu.
+
+Division always rounds upward with `Math.ceil`. Subtraction may produce negative results.
+
+Old saved groups, backups, and remote templates without modifier data must normalize to a disabled modifier.
 
 ## 11. Combo Configuration
 

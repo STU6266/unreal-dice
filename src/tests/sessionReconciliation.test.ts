@@ -12,10 +12,11 @@ function createSession(): GroupPlaySession {
       'set-1': {
         setId: 'set-1',
         isExpanded: true,
+        setModifierActive: false,
         total: 7,
         diceResults: [
-          { value: 3, locked: true },
-          { value: 4, locked: false },
+          { value: 3, mode: 'locked' },
+          { value: 4, mode: 'normal' },
         ],
       },
     },
@@ -33,7 +34,7 @@ describe('sessionReconciliation', () => {
 
     const session = reconcilePlaySession(createSession(), previousGroup, nextGroup)
 
-    expect(session.setStates['set-1']?.diceResults[0]?.locked).toBe(true)
+    expect(session.setStates['set-1']?.diceResults[0]?.mode).toBe('locked')
     expect(session.setStates['set-1']?.total).toBe(7)
   })
 
@@ -56,7 +57,7 @@ describe('sessionReconciliation', () => {
     const session = reconcilePlaySession(createSession(), previousGroup, nextGroup)
 
     expect(session.setStates['set-1']?.diceResults).toHaveLength(2)
-    expect(session.setStates['set-1']?.diceResults[0]?.locked).toBe(true)
+    expect(session.setStates['set-1']?.diceResults[0]?.mode).toBe('locked')
   })
 
   it('changed diceCount resets that set session', () => {

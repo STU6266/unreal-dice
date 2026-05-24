@@ -55,6 +55,41 @@ describe('backupService', () => {
     expect(validateBackup(backup).isValid).toBe(true)
   })
 
+  it('backup round-trip preserves modifier-enabled sets', () => {
+    const group = createTestGroup({
+      sets: [
+        createTestSet({
+          modifier: {
+            enabled: true,
+            operator: 'add',
+            value: 2,
+            application: 'each-die',
+          },
+        }),
+      ],
+    })
+    const parsed = parseBackupJson(JSON.stringify(createBackup([group], 'single-group')))
+
+    expect(parsed.isValid).toBe(true)
+    expect(parsed.backup?.groups[0]?.sets[0]?.modifier).toEqual(group.sets[0]?.modifier)
+  })
+
+  it('old backups without modifier data are accepted with a disabled modifier', () => {
+    const backup = createBackup([createTestGroup()], 'single-group')
+    const oldGroup = {
+      ...backup.groups[0],
+      sets: backup.groups[0]?.sets.map((set) => {
+        const oldSet: Partial<typeof set> = { ...set }
+        delete oldSet.modifier
+        return oldSet
+      }),
+    }
+    const parsed = parseBackupJson(JSON.stringify({ ...backup, groups: [oldGroup] }))
+
+    expect(parsed.isValid).toBe(true)
+    expect(parsed.backup?.groups[0]?.sets[0]?.modifier.enabled).toBe(false)
+  })
+
   it('invalid JSON is rejected safely', () => {
     expect(parseBackupJson('{broken').isValid).toBe(false)
   })

@@ -2,6 +2,8 @@ import { describe, expect, it } from 'vitest'
 import { APP_LIMITS } from '../domain/constants/limits'
 import { DATA_SCHEMA_VERSION } from '../domain/constants/storage'
 import {
+  normalizeDiceSet,
+  validateDiceModifier,
   validateDiceGroup,
   validateDiceSet,
   validateStoredUserGroupsData,
@@ -36,6 +38,49 @@ describe('validators', () => {
         expect.objectContaining({ path: 'set.diceCount' }),
       ]),
     )
+  })
+
+  it('accepts valid modifier configurations', () => {
+    const result = validateDiceModifier({
+      enabled: true,
+      operator: 'divide',
+      value: 2,
+      application: 'each-die',
+    })
+
+    expect(result.isValid).toBe(true)
+  })
+
+  it('rejects invalid modifier values and operators', () => {
+    expect(
+      validateDiceModifier({
+        enabled: true,
+        operator: 'add',
+        value: 0,
+        application: 'set-total',
+      }).isValid,
+    ).toBe(false)
+    expect(
+      validateDiceModifier({
+        enabled: true,
+        operator: 'power',
+        value: 2,
+        application: 'set-total',
+      }).isValid,
+    ).toBe(false)
+  })
+
+  it('normalizes old sets without modifier data to a disabled modifier', () => {
+    const set = normalizeDiceSet({
+      id: 'old-set',
+      name: 'Old Set',
+      diceCount: 1,
+      sides: 6,
+      diceColor: '#ffffff',
+      pipColor: '#000000',
+    })
+
+    expect(set?.modifier.enabled).toBe(false)
   })
 
   it('rejects a group with duplicate set IDs', () => {

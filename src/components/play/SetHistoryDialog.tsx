@@ -53,10 +53,26 @@ export function SetHistoryDialog({
                   {entry.diceResults.map((die, index) => (
                     <span key={index} className="history-die">
                       {die.value === 0 ? '—' : die.value}
-                      {die.locked ? <em>X</em> : null}
+                      {die.mode === 'locked' ? <em>X</em> : null}
+                      {die.mode === 'modifier-active' ? (
+                        <em>
+                          {copy.groupEditor.setDialog.operators[entry.modifier.operator]}
+                          {entry.modifier.value}
+                        </em>
+                      ) : null}
                     </span>
                   ))}
                 </div>
+                {entry.modifier.enabled && entry.modifier.application === 'set-total' ? (
+                  <span>
+                    {entry.setModifierActive
+                      ? copy.groupEditor.setDialog.modifierSummary.setTotal(
+                          copy.groupEditor.setDialog.operators[entry.modifier.operator],
+                          entry.modifier.value,
+                        )
+                      : copy.play.history.modifierOff}
+                  </span>
+                ) : null}
               </li>
             ))}
           </ol>

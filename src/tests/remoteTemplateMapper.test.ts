@@ -1,11 +1,13 @@
 import { describe, expect, it } from 'vitest'
 import type { RemoteQuickStartTemplateRow, StudioTemplateDraft } from '../domain/types/remoteTemplates'
+import type { DiceSet } from '../domain/types/dice'
 import {
   createNewStudioTemplateDraft,
   createTemplateKeyFromName,
   mapRemoteRowToQuickStartTemplate,
   prepareStudioTemplatePayload,
 } from '../domain/utils/remoteTemplateMapper'
+import { createDisabledModifier } from '../domain/utils/modifierUtils'
 import { mapPublishedRemoteTemplates } from '../services/quickStartTemplateService'
 
 const validRow: RemoteQuickStartTemplateRow = {
@@ -21,7 +23,7 @@ const validRow: RemoteQuickStartTemplateRow = {
       sides: 6,
       diceColor: '#ffffff',
       pipColor: '#000000',
-      modifier: 0,
+      modifier: createDisabledModifier(),
     },
   ],
   combos: [],
@@ -31,6 +33,8 @@ const validRow: RemoteQuickStartTemplateRow = {
   updated_at: '2026-01-01T00:00:00.000Z',
 }
 
+const validSets = validRow.sets as DiceSet[]
+
 describe('remote template mapping', () => {
   it('maps a valid remote row to a Quick Start group', () => {
     const template = mapRemoteRowToQuickStartTemplate(validRow)
@@ -38,6 +42,39 @@ describe('remote template mapping', () => {
     expect(template?.id).toBe('quick-start-risk-test')
     expect(template?.source).toBe('quick-start')
     expect(template?.sets[0].name).toBe('Attack')
+  })
+
+  it('maps a valid modifier-enabled remote set', () => {
+    const template = mapRemoteRowToQuickStartTemplate({
+      ...validRow,
+      sets: [
+        {
+          ...validSets[0],
+          modifier: {
+            enabled: true,
+            operator: 'multiply',
+            value: 2,
+            application: 'each-die',
+          },
+        },
+      ],
+    })
+
+    expect(template?.sets[0]?.modifier.enabled).toBe(true)
+    expect(template?.sets[0]?.modifier.operator).toBe('multiply')
+  })
+
+  it('normalizes remote rows without modifier data to a disabled modifier', () => {
+    const template = mapRemoteRowToQuickStartTemplate({
+      ...validRow,
+      sets: validSets.map((set) => {
+        const oldSet: Partial<typeof set> = { ...set }
+        delete oldSet.modifier
+        return oldSet
+      }),
+    })
+
+    expect(template?.sets[0]?.modifier.enabled).toBe(false)
   })
 
   it('rejects an invalid set in a remote row', () => {
@@ -103,7 +140,7 @@ describe('studio template preparation', () => {
           sides: 6,
           diceColor: '#ffffff',
           pipColor: '#000000',
-          modifier: 0,
+          modifier: createDisabledModifier(),
         },
       ],
       combos: [

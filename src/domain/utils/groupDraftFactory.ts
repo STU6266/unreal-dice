@@ -1,7 +1,7 @@
 import { APP_LIMITS } from '../constants/limits'
 import type { DiceCombo, DiceSet, LockedDiceCounting } from '../types/dice'
 import type { DiceGroup, GroupSource } from '../types/groups'
-import { validateDiceGroup } from '../validation/validators'
+import { normalizeDiceSet, validateDiceGroup } from '../validation/validators'
 
 export interface SetSlotDraft {
   id: string
@@ -57,7 +57,7 @@ export function createGroupDraftFromGroup(
     name: group.name,
     source: group.source,
     lockedDiceCounting: group.lockedDiceCounting,
-    slots: group.sets.map((set) => ({ id: idFactory(), set: { ...set } })),
+    slots: group.sets.map((set) => ({ id: idFactory(), set: normalizeDiceSet(set) })),
     combos: group.combos.map((combo) => ({
       ...combo,
       setIds: [...combo.setIds],
@@ -142,7 +142,9 @@ export function prepareGroupDraftForSaving(
     name,
     source: existingGroup?.source ?? draft.source,
     lockedDiceCounting: draft.lockedDiceCounting,
-    sets: configuredSets.map((set) => ({ ...set })),
+    sets: configuredSets
+      .map(normalizeDiceSet)
+      .filter((set): set is DiceSet => set !== null),
     combos: draft.combos.map((combo) => ({
       ...combo,
       setIds: [...combo.setIds],

@@ -1,6 +1,7 @@
 import { DEFAULT_SET_COLORS } from '../domain/constants/colors'
 import type { DiceCombo, DiceSet } from '../domain/types/dice'
 import type { DiceGroup, GroupSource } from '../domain/types/groups'
+import { createDisabledModifier } from '../domain/utils/modifierUtils'
 
 export function createTestSet(overrides: Partial<DiceSet> = {}): DiceSet {
   return {
@@ -10,7 +11,7 @@ export function createTestSet(overrides: Partial<DiceSet> = {}): DiceSet {
     sides: 6,
     diceColor: DEFAULT_SET_COLORS.diceColor,
     pipColor: DEFAULT_SET_COLORS.pipColor,
-    modifier: 0,
+    modifier: createDisabledModifier(),
     ...overrides,
   }
 }

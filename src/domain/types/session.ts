@@ -4,6 +4,7 @@ export interface SetPlayState {
   setId: string
   isExpanded: boolean
   diceResults: IndividualDieResult[]
+  setModifierActive: boolean
   total: number | null
 }
 

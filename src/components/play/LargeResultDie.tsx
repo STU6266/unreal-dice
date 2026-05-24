@@ -1,4 +1,5 @@
 import { usePressIntent } from '../../hooks/usePressIntent'
+import type { CSSProperties } from 'react'
 
 interface LargeResultDieProps {
   total: number | null
@@ -6,6 +7,7 @@ interface LargeResultDieProps {
   pipColor: string
   isExpanded: boolean
   hasLockedDice: boolean
+  hasActiveModifier: boolean
   label: string
   onToggleExpanded: () => void
   onOpenMenu: () => void
@@ -17,6 +19,7 @@ export function LargeResultDie({
   pipColor,
   isExpanded,
   hasLockedDice,
+  hasActiveModifier,
   label,
   onToggleExpanded,
   onOpenMenu,
@@ -25,14 +28,25 @@ export function LargeResultDie({
     onPress: onToggleExpanded,
     onHistory: onOpenMenu,
   })
+  const dieStyle = {
+    backgroundColor: diceColor,
+    color: pipColor,
+    borderColor: pipColor,
+    '--die-color': diceColor,
+  } as CSSProperties
 
   return (
     <button
-      className={`large-result-die${hasLockedDice ? ' large-result-die--locked' : ''}`}
+      className={[
+        'large-result-die',
+        hasLockedDice ? 'large-result-die--locked' : '',
+        hasActiveModifier ? 'large-result-die--modifier' : '',
+        hasActiveModifier && hasLockedDice ? 'large-result-die--modifier-locked' : '',
+      ].join(' ')}
       type="button"
       aria-label={label}
       aria-expanded={isExpanded}
-      style={{ backgroundColor: diceColor, color: pipColor, borderColor: pipColor }}
+      style={dieStyle}
       {...pressHandlers}
     >
       {total ?? '—'}

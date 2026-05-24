@@ -22,6 +22,18 @@ export function SetSlotCard({
   const set = slot.set
   const title = set?.name || `Set ${position}`
   const formula = set ? `${set.diceCount}d${set.sides}` : copy.groupEditor.setSlot.empty
+  const modifierSummary =
+    set?.modifier.enabled === true
+      ? set.modifier.application === 'each-die'
+        ? copy.groupEditor.setDialog.modifierSummary.eachDie(
+            copy.groupEditor.setDialog.operators[set.modifier.operator],
+            set.modifier.value,
+          )
+        : copy.groupEditor.setDialog.modifierSummary.setTotal(
+            copy.groupEditor.setDialog.operators[set.modifier.operator],
+            set.modifier.value,
+          )
+      : null
 
   return (
     <article
@@ -45,7 +57,7 @@ export function SetSlotCard({
       </div>
       <div className="set-slot-card__body">
         <h2>{title}</h2>
-        <p>{formula}</p>
+        <p>{modifierSummary ? `${formula} · ${modifierSummary}` : formula}</p>
         {combo ? (
           <p className="set-slot-card__combo-label">
             {copy.groupEditor.setSlot.comboLabel(combo.name)}

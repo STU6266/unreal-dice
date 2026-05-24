@@ -1,8 +1,10 @@
-import type { LockedDiceCounting } from './dice'
+import type { DiceModifier, LockedDiceCounting } from './dice'
+
+export type IndividualDieMode = 'normal' | 'modifier-active' | 'locked'
 
 export interface IndividualDieResult {
   value: number
-  locked: boolean
+  mode: IndividualDieMode
 }
 
 export interface SetHistoryEntry {
@@ -12,7 +14,8 @@ export interface SetHistoryEntry {
   diceCount: number
   sides: number
   diceResults: IndividualDieResult[]
-  modifier: number
+  modifier: DiceModifier
+  setModifierActive: boolean
   lockedDiceCounting: LockedDiceCounting
   total: number
   rolledAt: string

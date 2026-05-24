@@ -3,8 +3,10 @@ import { ComboEditorDialog } from '../components/groups/ComboEditorDialog'
 import { ComboRollButton } from '../components/play/ComboRollButton'
 import { PlayHelpDialog } from '../components/play/PlayHelpDialog'
 import { RollAllButton } from '../components/play/RollAllButton'
+import { SetActionDialog } from '../components/play/SetActionDialog'
 import { SetHistoryDialog } from '../components/play/SetHistoryDialog'
 import { SetPlayTile } from '../components/play/SetPlayTile'
+import { SetEditorDialog } from '../components/groups/SetEditorDialog'
 import { copy } from '../content/en'
 import type { QuickStartTemplate } from '../domain/data/quickStartTemplates'
 import type { DiceCombo, DiceSet } from '../domain/types/dice'
@@ -97,6 +99,8 @@ function LoadedPlayMode({
     | null
   const [activeGroup, setActiveGroup] = useState(group)
   const [historySetId, setHistorySetId] = useState<string | null>(null)
+  const [activeSetId, setActiveSetId] = useState<string | null>(null)
+  const [editingSetId, setEditingSetId] = useState<string | null>(null)
   const [historyEntries, setHistoryEntries] = useState<SetHistoryEntry[]>([])
   const [isAddingCombo, setIsAddingCombo] = useState(false)
   const [isHelpOpen, setIsHelpOpen] = useState(false)
@@ -107,12 +111,18 @@ function LoadedPlayMode({
     rollAll,
     rollCombo,
     toggleDieLocked,
+    toggleSetModifierActive,
+    resetSetState,
   } = usePlaySession(activeGroup, routeState?.playSession)
 
   const historySet =
     historySetId === null
       ? undefined
       : activeGroup.sets.find((set) => set.id === historySetId)
+  const activeSet =
+    activeSetId === null ? undefined : activeGroup.sets.find((set) => set.id === activeSetId)
+  const editingSet =
+    editingSetId === null ? undefined : activeGroup.sets.find((set) => set.id === editingSetId)
 
   return (
     <section className="play-screen" aria-labelledby="play-title">
@@ -138,7 +148,7 @@ function LoadedPlayMode({
               state={setState}
               comboColor={comboForSet?.color}
               onToggleExpanded={() => toggleSetExpanded(set.id)}
-              onOpenMenu={() => openHistory(set.id)}
+              onOpenMenu={() => setActiveSetId(set.id)}
               onRoll={() => rollSingleSet(set.id)}
               onToggleDieLocked={(dieIndex) => toggleDieLocked(set.id, dieIndex)}
             />
@@ -224,6 +234,34 @@ function LoadedPlayMode({
         />
       ) : null}
 
+      {activeSet ? (
+        <SetActionDialog
+          set={activeSet}
+          source={source}
+          setModifierActive={session.setStates[activeSet.id]?.setModifierActive ?? false}
+          onHistory={() => openHistory(activeSet.id)}
+          onToggleModifier={() => {
+            toggleSetModifierActive(activeSet.id)
+            setActiveSetId(null)
+          }}
+          onModifierSetup={() => {
+            setEditingSetId(activeSet.id)
+            setActiveSetId(null)
+          }}
+          onCopyToEdit={copyQuickStartToEdit}
+          onClose={() => setActiveSetId(null)}
+        />
+      ) : null}
+
+      {editingSet ? (
+        <SetEditorDialog
+          set={editingSet}
+          slotPosition={activeGroup.sets.findIndex((set) => set.id === editingSet.id) + 1}
+          onCancel={() => setEditingSetId(null)}
+          onSave={savePlaySet}
+        />
+      ) : null}
+
       {isHelpOpen ? <PlayHelpDialog onClose={() => setIsHelpOpen(false)} /> : null}
 
       {isAddingCombo && source === 'saved' ? (
@@ -239,8 +277,22 @@ function LoadedPlayMode({
   )
 
   function openHistory(setId: string): void {
+    setActiveSetId(null)
     setHistorySetId(setId)
     setHistoryEntries(loadSetHistory(setId))
+  }
+
+  function savePlaySet(updatedSet: DiceSet): void {
+    const nextGroup = {
+      ...activeGroup,
+      sets: activeGroup.sets.map((set) => (set.id === updatedSet.id ? updatedSet : set)),
+      updatedAt: new Date().toISOString(),
+    }
+    const groups = loadUserGroups()
+    saveUserGroups(groups.map((item) => (item.id === nextGroup.id ? nextGroup : item)))
+    setActiveGroup(nextGroup)
+    resetSetState(updatedSet.id, nextGroup)
+    setEditingSetId(null)
   }
 
   function savePlayCombo(_combo: DiceCombo, updatedCombos: DiceCombo[]): void {

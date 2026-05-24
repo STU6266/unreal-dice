@@ -1,6 +1,7 @@
 import { BACKUP_APP_ID, BACKUP_VERSION } from '../domain/constants/backup'
 import type { BackupExportType, UnrealDiceBackup } from '../domain/types/backup'
 import type { DiceGroup } from '../domain/types/groups'
+import { normalizeDiceGroup } from '../domain/validation/validators'
 
 export function createBackup(
   groups: readonly DiceGroup[],
@@ -12,14 +13,7 @@ export function createBackup(
     backupVersion: BACKUP_VERSION,
     exportedAt: now(),
     exportType,
-    groups: groups.map((group) => ({
-      ...group,
-      sets: group.sets.map((set) => ({ ...set })),
-      combos: group.combos.map((combo) => ({
-        ...combo,
-        setIds: [...combo.setIds],
-      })),
-    })),
+    groups: groups.map((group) => normalizeDiceGroup(group)),
   }
 }
 

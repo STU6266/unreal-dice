@@ -7,6 +7,7 @@ Use this guide to enable remote Quick Start template management for unrealDice.
 - Never place the Supabase service-role key in Vite environment variables.
 - Never commit the real `.env` file.
 - The `/studio/templates` route being unlinked is convenience only. Supabase Auth and Row Level Security are the actual security boundary.
+- Modifier-enabled sets are stored inside the existing `sets` JSON field. No service-role key or extra browser credential is required for this JSON shape change.
 
 ## Setup Steps
 

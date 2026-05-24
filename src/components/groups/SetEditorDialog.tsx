@@ -22,6 +22,7 @@ interface SetEditorErrors {
   sides?: string
   diceColor?: string
   pipColor?: string
+  modifierValue?: string
 }
 
 export function SetEditorDialog({
@@ -147,6 +148,81 @@ export function SetEditorDialog({
               </small>
             ) : null}
           </div>
+
+          <label className="field field--checkbox">
+            <input
+              type="checkbox"
+              checked={input.modifier.enabled}
+              onChange={(event) =>
+                updateInput('modifier', {
+                  ...input.modifier,
+                  enabled: event.target.checked,
+                })
+              }
+            />
+            <span>{copy.groupEditor.setDialog.fields.enableModifier}</span>
+          </label>
+
+          {input.modifier.enabled ? (
+            <>
+              <label className="field">
+                <span>{copy.groupEditor.setDialog.fields.modifierOperator}</span>
+                <select
+                  value={input.modifier.operator}
+                  onChange={(event) =>
+                    updateInput('modifier', {
+                      ...input.modifier,
+                      operator: event.target.value as typeof input.modifier.operator,
+                    })
+                  }
+                >
+                  <option value="add">{copy.groupEditor.setDialog.operators.add}</option>
+                  <option value="subtract">{copy.groupEditor.setDialog.operators.subtract}</option>
+                  <option value="multiply">{copy.groupEditor.setDialog.operators.multiply}</option>
+                  <option value="divide">{copy.groupEditor.setDialog.operators.divide}</option>
+                </select>
+              </label>
+
+              <label className="field">
+                <span>{copy.groupEditor.setDialog.fields.modifierValue}</span>
+                <input
+                  type="number"
+                  min={1}
+                  max={100}
+                  value={input.modifier.value}
+                  aria-describedby={errors.modifierValue ? 'modifier-value-error' : 'modifier-help'}
+                  onChange={(event) =>
+                    updateInput('modifier', {
+                      ...input.modifier,
+                      value: Number(event.target.value),
+                    })
+                  }
+                />
+                {errors.modifierValue ? (
+                  <small className="field-error" id="modifier-value-error">
+                    {errors.modifierValue}
+                  </small>
+                ) : null}
+              </label>
+
+              <label className="field">
+                <span>{copy.groupEditor.setDialog.fields.modifierApplication}</span>
+                <select
+                  value={input.modifier.application}
+                  onChange={(event) =>
+                    updateInput('modifier', {
+                      ...input.modifier,
+                      application: event.target.value as typeof input.modifier.application,
+                    })
+                  }
+                >
+                  <option value="each-die">{copy.groupEditor.setDialog.fields.eachDie}</option>
+                  <option value="set-total">{copy.groupEditor.setDialog.fields.setTotal}</option>
+                </select>
+                <small id="modifier-help">{copy.groupEditor.setDialog.modifierHelp}</small>
+              </label>
+            </>
+          ) : null}
         </div>
 
         {hasLowContrast ? (
@@ -202,6 +278,15 @@ function validateInput(input: SetInput): SetEditorErrors {
 
   if (input.pipColor.trim() === '') {
     errors.pipColor = copy.groupEditor.setDialog.errors.pipColor
+  }
+
+  if (
+    input.modifier.enabled &&
+    (!Number.isInteger(input.modifier.value) ||
+      input.modifier.value < 1 ||
+      input.modifier.value > 100)
+  ) {
+    errors.modifierValue = copy.groupEditor.setDialog.errors.modifierValue
   }
 
   return errors

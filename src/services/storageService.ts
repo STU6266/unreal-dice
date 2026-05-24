@@ -2,6 +2,7 @@ import { STORAGE_KEYS } from '../domain/constants/storage'
 import type { DiceGroup } from '../domain/types/groups'
 import {
   createStoredUserGroupsData,
+  normalizeDiceGroup,
   validateStoredUserGroupsData,
 } from '../domain/validation/validators'
 
@@ -34,12 +35,22 @@ export function loadUserGroups(
     return []
   }
 
-  const validation = validateStoredUserGroupsData(parsedValue)
-  if (!validation.isValid || !isStoredUserGroupsData(parsedValue)) {
+  if (!isStoredUserGroupsData(parsedValue)) {
     return []
   }
 
-  return parsedValue.groups
+  const normalizedData = {
+    ...parsedValue,
+    groups: parsedValue.groups
+      .map(normalizeDiceGroup)
+      .filter((group): group is DiceGroup => group !== null),
+  }
+  const validation = validateStoredUserGroupsData(normalizedData)
+  if (!validation.isValid) {
+    return []
+  }
+
+  return normalizedData.groups
 }
 
 export function saveUserGroups(

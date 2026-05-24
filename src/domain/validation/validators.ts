@@ -1,8 +1,9 @@
 import { APP_LIMITS } from '../constants/limits'
 import { DATA_SCHEMA_VERSION } from '../constants/storage'
-import type { LockedDiceCounting } from '../types/dice'
+import type { DiceCombo, DiceModifier, DiceSet, LockedDiceCounting } from '../types/dice'
 import type { DiceGroup, GroupSource } from '../types/groups'
 import type { StoredUserGroupsData } from '../types/storage'
+import { normalizeDiceModifier, isValidDiceModifier } from '../utils/modifierUtils'
 import {
   createValidationResult,
   type ValidationIssue,
@@ -78,15 +79,43 @@ export function validateDiceSet(
     'Pip color is required.',
   )
 
-  if (typeof value.modifier !== 'number' || !Number.isFinite(value.modifier)) {
+  if (
+    value.modifier !== undefined &&
+    typeof value.modifier !== 'number' &&
+    !isValidDiceModifier(value.modifier)
+  ) {
+    issues.push(...validateDiceModifier(value.modifier, `${path}.modifier`).issues)
+  }
+
+  return createValidationResult(issues)
+}
+
+export function validateDiceModifier(
+  value: unknown,
+  path = 'modifier',
+): ValidationResult {
+  const issues: ValidationIssue[] = []
+
+  if (!isRecord(value)) {
+    return createValidationResult([{ path, message: 'Modifier must be an object.' }])
+  }
+
+  if (typeof value.enabled !== 'boolean') {
+    issues.push({ path: `${path}.enabled`, message: 'Modifier enabled flag is required.' })
+  }
+
+  if (!isOneOf(value.operator, ['add', 'subtract', 'multiply', 'divide'] as const)) {
+    issues.push({ path: `${path}.operator`, message: 'Modifier operator is not supported.' })
+  }
+
+  if (!isIntegerInRange(value.value, 1, 100)) {
+    issues.push({ path: `${path}.value`, message: 'Modifier value must be an integer from 1 to 100.' })
+  }
+
+  if (!isOneOf(value.application, ['each-die', 'set-total'] as const)) {
     issues.push({
-      path: `${path}.modifier`,
-      message: 'Modifier must be a finite number.',
-    })
-  } else if (value.modifier !== 0) {
-    issues.push({
-      path: `${path}.modifier`,
-      message: 'Modifier must remain 0 in Version 1 data.',
+      path: `${path}.application`,
+      message: 'Modifier application is not supported.',
     })
   }
 
@@ -306,7 +335,63 @@ export function createStoredUserGroupsData(
 ): StoredUserGroupsData {
   return {
     schemaVersion: DATA_SCHEMA_VERSION,
-    groups,
+    groups: groups
+      .map(normalizeDiceGroup)
+      .filter((group): group is DiceGroup => group !== null),
+  }
+}
+
+export function normalizeDiceSet(value: DiceSet): DiceSet
+export function normalizeDiceSet(value: unknown): DiceSet | null
+export function normalizeDiceSet(value: unknown): DiceSet | null {
+  if (!isRecord(value)) {
+    return null
+  }
+
+  return {
+    id: typeof value.id === 'string' ? value.id : '',
+    name: typeof value.name === 'string' ? value.name : '',
+    diceCount: typeof value.diceCount === 'number' ? value.diceCount : 1,
+    sides: typeof value.sides === 'number' ? value.sides : APP_LIMITS.minSidesPerDie,
+    diceColor: typeof value.diceColor === 'string' ? value.diceColor : '',
+    pipColor: typeof value.pipColor === 'string' ? value.pipColor : '',
+    modifier: normalizeDiceModifier(value.modifier) as DiceModifier,
+  }
+}
+
+export function normalizeDiceGroup(value: DiceGroup): DiceGroup
+export function normalizeDiceGroup(value: unknown): DiceGroup | null
+export function normalizeDiceGroup(value: unknown): DiceGroup | null {
+  if (!isRecord(value)) {
+    return null
+  }
+
+  return {
+    id: typeof value.id === 'string' ? value.id : '',
+    name: typeof value.name === 'string' ? value.name : '',
+    source: isOneOf(value.source, VALID_GROUP_SOURCES) ? value.source : 'user',
+    lockedDiceCounting: isOneOf(value.lockedDiceCounting, VALID_LOCKED_DICE_COUNTING)
+      ? value.lockedDiceCounting
+      : 'exclude',
+    sets: Array.isArray(value.sets)
+      ? value.sets
+          .map(normalizeDiceSet)
+          .filter((set): set is DiceSet => set !== null)
+      : [],
+    combos: Array.isArray(value.combos)
+      ? value.combos
+          .filter(isRecord)
+          .map((combo): DiceCombo => ({
+            id: typeof combo.id === 'string' ? combo.id : '',
+            name: typeof combo.name === 'string' ? combo.name : '',
+            color: typeof combo.color === 'string' ? combo.color : '',
+            setIds: Array.isArray(combo.setIds)
+              ? combo.setIds.filter((setId): setId is string => typeof setId === 'string')
+              : [],
+          }))
+      : [],
+    createdAt: typeof value.createdAt === 'string' ? value.createdAt : new Date().toISOString(),
+    updatedAt: typeof value.updatedAt === 'string' ? value.updatedAt : new Date().toISOString(),
   }
 }
 

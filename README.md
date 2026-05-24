@@ -7,9 +7,9 @@ unrealDice is a local-first dice application for tabletop games and quick decisi
 - Home navigation for all Version 1 tools
 - Quick Start read-only templates with copy-to-edit support
 - Optional Supabase-backed published Quick Start templates with built-in offline fallback
-- Saved user groups with configurable sets, colors, locked-dice counting, and combos
+- Saved user groups with configurable sets, colors, optional modifiers, locked-dice counting, and combos
 - Create/Edit Group workflow with validation, confirmations, and local persistence
-- Real Play Mode with set rolls, Roll All, combo rolls, expandable dice, temporary locks, set history, and Add Combo during play
+- Real Play Mode with set rolls, Roll All, combo rolls, expandable dice, temporary locks/modifier states, set history, and Add Combo during play
 - Coin & Random tools with separate local histories
 - Safe JSON export/import for saved group backups
 - Install App / Offline Help screen and production PWA configuration
@@ -20,6 +20,7 @@ unrealDice is a local-first dice application for tabletop games and quick decisi
 - Data is local-first: saved groups and histories live in browser storage, not on a server.
 - JSON backups are validated and imported as new IDs to avoid overwriting existing groups.
 - Dice results, expanded sets, and locked dice are session-only play state and are not saved into reusable group definitions.
+- Modifier configuration is saved with sets, while active per-die and set-total modifier states remain play-session state.
 - PWA support uses a service worker for the application shell while user data remains in browser storage.
 - Remote template management, when configured, uses Supabase Auth and RLS; the unlinked studio route is not treated as security.
 

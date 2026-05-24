@@ -1153,6 +1153,18 @@ p {
   text-align: center;
 }
 
+.set-title-button {
+  display: inline;
+  max-width: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  overflow-wrap: anywhere;
+  cursor: pointer;
+}
+
 .set-play-tile > .button-link {
   min-height: 32px;
   max-width: 100%;
@@ -1183,15 +1195,29 @@ p {
   filter: brightness(0.48) saturate(0.85);
 }
 
+.large-result-die--modifier,
+.individual-die--modifier {
+  filter: brightness(1.35) saturate(1.08);
+}
+
+.large-result-die--modifier-locked {
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.34) 0 50%, rgba(0, 0, 0, 0.42) 50%),
+    var(--die-color, currentColor);
+  filter: none;
+}
+
 .individual-dice-grid {
   width: 100%;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(38px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(34px, clamp(38px, 10vw, 72px)));
   gap: 6px;
+  justify-content: center;
 }
 
 .individual-die {
-  min-width: 38px;
+  width: 100%;
+  min-width: 0;
   aspect-ratio: 1;
   display: grid;
   place-items: center;

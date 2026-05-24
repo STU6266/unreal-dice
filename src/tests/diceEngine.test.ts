@@ -1,13 +1,29 @@
 import { describe, expect, it } from 'vitest'
 import {
+  calculateModifiedSetTotal,
   calculateSetTotal,
   rollAllSets,
   rollComboSets,
   rollDie,
   rollSet,
 } from '../domain/utils/diceEngine'
+import type { SetPlayState } from '../domain/types/session'
 import { createPlaySession } from '../domain/utils/playSessionFactory'
 import { createTestCombo, createTestGroup, createTestSet } from './testFixtures'
+
+const eachDieMultiplyModifier = {
+  enabled: true,
+  operator: 'multiply',
+  value: 2,
+  application: 'each-die',
+} as const
+
+const setTotalDivideModifier = {
+  enabled: true,
+  operator: 'divide',
+  value: 2,
+  application: 'set-total',
+} as const
 
 function createRandomSequence(values: number[]): () => number {
   let index = 0
@@ -33,7 +49,7 @@ describe('diceEngine', () => {
   it('initial dice are unlocked', () => {
     const state = rollSet(createTestSet({ diceCount: 2 }), undefined, 'include')
 
-    expect(state.diceResults.every((die) => !die.locked)).toBe(true)
+    expect(state.diceResults.every((die) => die.mode === 'normal')).toBe(true)
   })
 
   it('total is correct for an unlocked set', () => {
@@ -51,8 +67,8 @@ describe('diceEngine', () => {
     expect(
       calculateSetTotal(
         [
-          { value: 2, locked: false },
-          { value: 3, locked: false },
+          { value: 2, mode: 'normal' },
+          { value: 3, mode: 'normal' },
         ],
         4,
         'include',
@@ -61,13 +77,14 @@ describe('diceEngine', () => {
   })
 
   it('a locked die retains its value during reroll', () => {
-    const previousState = {
+    const previousState: SetPlayState = {
       setId: 'set-1',
       isExpanded: false,
       total: 4,
+      setModifierActive: false,
       diceResults: [
-        { value: 4, locked: true },
-        { value: 2, locked: false },
+        { value: 4, mode: 'locked' },
+        { value: 2, mode: 'normal' },
       ],
     }
     const nextState = rollSet(
@@ -81,13 +98,14 @@ describe('diceEngine', () => {
   })
 
   it('a die locked before the first roll stays unrolled', () => {
-    const previousState = {
+    const previousState: SetPlayState = {
       setId: 'set-1',
       isExpanded: true,
       total: null,
+      setModifierActive: false,
       diceResults: [
-        { value: 0, locked: true },
-        { value: 0, locked: false },
+        { value: 0, mode: 'locked' },
+        { value: 0, mode: 'normal' },
       ],
     }
     const nextState = rollSet(
@@ -97,17 +115,18 @@ describe('diceEngine', () => {
       () => 0.5,
     )
 
-    expect(nextState.diceResults[0]).toEqual({ value: 0, locked: true })
+    expect(nextState.diceResults[0]).toEqual({ value: 0, mode: 'locked' })
     expect(nextState.diceResults[1]?.value).toBe(4)
     expect(nextState.total).toBe(4)
   })
 
   it('an unlocked die is rerolled', () => {
-    const previousState = {
+    const previousState: SetPlayState = {
       setId: 'set-1',
       isExpanded: false,
       total: 4,
-      diceResults: [{ value: 4, locked: false }],
+      setModifierActive: false,
+      diceResults: [{ value: 4, mode: 'normal' }],
     }
     const nextState = rollSet(
       createTestSet({ id: 'set-1', diceCount: 1, sides: 6 }),
@@ -123,8 +142,8 @@ describe('diceEngine', () => {
     expect(
       calculateSetTotal(
         [
-          { value: 5, locked: true },
-          { value: 1, locked: false },
+          { value: 5, mode: 'locked' },
+          { value: 1, mode: 'normal' },
         ],
         0,
         'include',
@@ -136,8 +155,8 @@ describe('diceEngine', () => {
     expect(
       calculateSetTotal(
         [
-          { value: 5, locked: true },
-          { value: 1, locked: false },
+          { value: 5, mode: 'locked' },
+          { value: 1, mode: 'normal' },
         ],
         0,
         'exclude',
@@ -146,13 +165,14 @@ describe('diceEngine', () => {
   })
 
   it('rerolling an all-locked set in include mode retains the total', () => {
-    const previousState = {
+    const previousState: SetPlayState = {
       setId: 'set-1',
       isExpanded: false,
       total: 7,
+      setModifierActive: false,
       diceResults: [
-        { value: 3, locked: true },
-        { value: 4, locked: true },
+        { value: 3, mode: 'locked' },
+        { value: 4, mode: 'locked' },
       ],
     }
     const nextState = rollSet(
@@ -165,24 +185,25 @@ describe('diceEngine', () => {
     expect(nextState.total).toBe(7)
   })
 
-  it('rerolling an all-locked set in exclude mode returns modifier-only total', () => {
-    const previousState = {
+  it('rerolling an all-locked set in exclude mode returns zero without a modifier', () => {
+    const previousState: SetPlayState = {
       setId: 'set-1',
       isExpanded: false,
       total: 7,
+      setModifierActive: false,
       diceResults: [
-        { value: 3, locked: true },
-        { value: 4, locked: true },
+        { value: 3, mode: 'locked' },
+        { value: 4, mode: 'locked' },
       ],
     }
     const nextState = rollSet(
-      createTestSet({ id: 'set-1', diceCount: 2, modifier: 2 }),
+      createTestSet({ id: 'set-1', diceCount: 2 }),
       previousState,
       'exclude',
       () => 0,
     )
 
-    expect(nextState.total).toBe(2)
+    expect(nextState.total).toBe(0)
   })
 
   it('Roll All combined total equals the sum of newly rolled set totals', () => {
@@ -225,5 +246,70 @@ describe('diceEngine', () => {
 
     expect(session.setStates['set-1']?.total).toBeNull()
     expect(session.setStates['set-2']?.total).toBe(1)
+  })
+
+  it('each-die multiply applies only to modifier-active dice', () => {
+    const total = calculateModifiedSetTotal(
+      [
+        { value: 2, mode: 'modifier-active' },
+        { value: 5, mode: 'normal' },
+        { value: 4, mode: 'modifier-active' },
+        { value: 1, mode: 'locked' },
+        { value: 6, mode: 'normal' },
+      ],
+      createTestSet({ diceCount: 5, modifier: eachDieMultiplyModifier }),
+      'exclude',
+      false,
+    )
+
+    expect(total).toBe(23)
+  })
+
+  it('each-die divide rounds each modified die upward before summing', () => {
+    const total = calculateModifiedSetTotal(
+      [
+        { value: 5, mode: 'modifier-active' },
+        { value: 3, mode: 'modifier-active' },
+        { value: 4, mode: 'normal' },
+      ],
+      createTestSet({
+        diceCount: 3,
+        modifier: { ...eachDieMultiplyModifier, operator: 'divide', value: 2 },
+      }),
+      'include',
+      false,
+    )
+
+    expect(total).toBe(9)
+  })
+
+  it('set-total divide applies once after locked dice counting', () => {
+    const total = calculateModifiedSetTotal(
+      [
+        { value: 5, mode: 'normal' },
+        { value: 3, mode: 'locked' },
+        { value: 4, mode: 'normal' },
+      ],
+      createTestSet({ diceCount: 3, modifier: setTotalDivideModifier }),
+      'exclude',
+      true,
+    )
+
+    expect(total).toBe(5)
+  })
+
+  it('disabled set-total session modifier returns the base total', () => {
+    const total = calculateModifiedSetTotal(
+      [
+        { value: 5, mode: 'normal' },
+        { value: 3, mode: 'normal' },
+        { value: 4, mode: 'normal' },
+      ],
+      createTestSet({ diceCount: 3, modifier: setTotalDivideModifier }),
+      'include',
+      false,
+    )
+
+    expect(total).toBe(12)
   })
 })

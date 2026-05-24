@@ -39,6 +39,7 @@ Use this checklist before deployment and real-device testing.
 - [ ] Empty set slots are ignored only after confirmation
 - [ ] Set colors and names display correctly
 - [ ] Low-contrast set colors show a warning
+- [ ] Optional set modifiers can be enabled, validated, saved, edited, and removed
 
 ## Combos
 
@@ -52,6 +53,8 @@ Use this checklist before deployment and real-device testing.
 
 - [ ] Export one group downloads a JSON file
 - [ ] Export All downloads one JSON file with saved groups
+- [ ] Exporting and importing a modifier-enabled group preserves modifier configuration
+- [ ] Older backups without modifier data import with modifiers disabled
 - [ ] Importing a valid backup adds new imported groups
 - [ ] Importing the same backup again creates unique imported names
 - [ ] Invalid JSON shows an error and changes no saved groups
@@ -76,11 +79,15 @@ Use this checklist before deployment and real-device testing.
 - [ ] Expanding a set shows current individual die values
 - [ ] Collapsed sets update internally after rolling
 - [ ] Double-click or long press on an individual die toggles lock state
+- [ ] For Each Die modifiers, individual dice cycle modifier-active -> normal -> locked -> modifier-active
+- [ ] For Set Total modifiers, the set action menu toggles the session modifier on and off
 - [ ] Locked dice retain values during reroll
+- [ ] Modifier totals match add/subtract/multiply/divide rules, with division rounded up
 - [ ] Include locked dice counts locked values in totals
 - [ ] Exclude locked dice removes locked values from totals
 - [ ] Large set die darkens when any die in the set is locked
 - [ ] Set history shows latest rolls and marks locked dice with X
+- [ ] Modifier-enabled history entries show per-die modifier state or set-total modifier notes
 - [ ] Clearing one set history does not clear another set history
 - [ ] Add Combo during saved-group play preserves current results and locks
 - [ ] Quick Start Copy to Edit creates an editable copy without copying temporary roll state

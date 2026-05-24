@@ -36,7 +36,8 @@ describe('playSessionFactory', () => {
       setId: 'set-1',
       isExpanded: true,
       total: 4,
-      diceResults: [{ value: 4, locked: true }],
+      setModifierActive: false,
+      diceResults: [{ value: 4, mode: 'locked' }],
     }
 
     expect(group.sets[0]).not.toHaveProperty('diceResults')

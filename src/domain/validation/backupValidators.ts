@@ -1,7 +1,8 @@
 import { APP_LIMITS } from '../constants/limits'
 import { BACKUP_APP_ID, BACKUP_VERSION } from '../constants/backup'
 import type { UnrealDiceBackup } from '../types/backup'
-import { validateDiceGroup } from './validators'
+import type { DiceGroup } from '../types/groups'
+import { normalizeDiceGroup, validateDiceGroup } from './validators'
 import {
   createValidationResult,
   type ValidationIssue,
@@ -15,17 +16,31 @@ export function parseBackupJson(rawValue: string): ValidationResult & {
 } {
   try {
     const parsedValue = JSON.parse(rawValue) as unknown
-    const validation = validateBackup(parsedValue)
+    const normalizedValue = normalizeBackup(parsedValue)
+    const validation = validateBackup(normalizedValue)
 
-    if (!validation.isValid || !isBackup(parsedValue)) {
+    if (!validation.isValid || !isBackup(normalizedValue)) {
       return validation
     }
 
-    return { ...validation, backup: parsedValue }
+    return { ...validation, backup: normalizedValue }
   } catch {
     return createValidationResult([
       { path: 'backup', message: 'File must contain valid JSON.' },
     ])
+  }
+}
+
+function normalizeBackup(value: unknown): unknown {
+  if (!isRecord(value) || !Array.isArray(value.groups)) {
+    return value
+  }
+
+  return {
+    ...value,
+    groups: value.groups
+      .map(normalizeDiceGroup)
+      .filter((group): group is DiceGroup => group !== null),
   }
 }
 

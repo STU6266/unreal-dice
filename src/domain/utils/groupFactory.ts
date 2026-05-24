@@ -2,6 +2,7 @@ import { APP_LIMITS } from '../constants/limits'
 import type { QuickStartTemplate } from '../data/quickStartTemplates'
 import type { DiceCombo, DiceSet } from '../types/dice'
 import type { DiceGroup } from '../types/groups'
+import { copyModifier, normalizeDiceModifier } from './modifierUtils'
 import { createUniqueCopyName } from './uniqueNames'
 
 export type AddQuickStartCopyResult =
@@ -70,7 +71,7 @@ function copySet(set: Readonly<DiceSet>, id: string): DiceSet {
     sides: set.sides,
     diceColor: set.diceColor,
     pipColor: set.pipColor,
-    modifier: set.modifier,
+    modifier: copyModifier(normalizeDiceModifier(set.modifier)),
   }
 }
 

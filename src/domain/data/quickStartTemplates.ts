@@ -1,6 +1,7 @@
 import { DEFAULT_SET_COLORS } from '../constants/colors'
 import type { DiceCombo, DiceSet } from '../types/dice'
 import type { DiceGroup } from '../types/groups'
+import { createDisabledModifier } from '../utils/modifierUtils'
 
 type ReadonlyDiceSet = Readonly<DiceSet>
 type ReadonlyDiceCombo = Readonly<DiceCombo> & {
@@ -32,7 +33,7 @@ function createTemplateSet(
     sides,
     diceColor: DEFAULT_SET_COLORS.diceColor,
     pipColor: DEFAULT_SET_COLORS.pipColor,
-    modifier: 0,
+    modifier: createDisabledModifier(),
   }
 }
 

@@ -6,7 +6,7 @@ import type {
   StudioTemplateDraft,
 } from '../types/remoteTemplates'
 import { createQuickStartId, validateRemoteTemplateRow } from '../validation/remoteTemplateValidators'
-import { validateDiceGroup } from '../validation/validators'
+import { normalizeDiceSet, validateDiceGroup } from '../validation/validators'
 
 export function mapRemoteRowToQuickStartTemplate(
   row: RemoteQuickStartTemplateRow,
@@ -133,7 +133,9 @@ export function isSafeTemplateKey(templateKey: string): boolean {
 }
 
 function copySets(sets: readonly DiceSet[]): DiceSet[] {
-  return sets.map((set) => ({ ...set }))
+  return sets
+    .map(normalizeDiceSet)
+    .filter((set): set is DiceSet => set !== null)
 }
 
 function copyCombos(combos: readonly DiceCombo[]): DiceCombo[] {

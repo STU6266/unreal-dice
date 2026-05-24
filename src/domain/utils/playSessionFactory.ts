@@ -12,6 +12,7 @@ export function createPlaySession(
       setId: set.id,
       isExpanded: false,
       diceResults: [],
+      setModifierActive: set.modifier.enabled && set.modifier.application === 'set-total',
       total: null,
     }
   })
