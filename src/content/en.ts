@@ -1,7 +1,7 @@
 export const copy = {
   home: {
     appName: 'unrealDice',
-    eyebrow: 'Local-first dice companion',
+    eyebrow: 'created by STUdevil',
     mainMenuLabel: 'Main menu',
     subtitle: 'Offline dice tools for tabletop and quick decisions.',
     footerNote:
