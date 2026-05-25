@@ -1,41 +1,101 @@
 # unrealDice
 
-unrealDice is a local-first dice application for tabletop games and quick decisions. Version 1 includes configurable dice groups, combos, safe backup import/export, Coin & Random tools, a real play mode, and an offline-capable PWA foundation.
+unrealDice is a local-first React and TypeScript PWA for tabletop dice management, quick random decisions and reusable dice setups.
 
-## Current Features
+The project is more than a simple dice roller: it focuses on saved dice groups, reusable play setups, offline use, safe import/export and a practical mobile-friendly app flow.
 
-- Home navigation for all Version 1 tools
-- Quick Start read-only templates with copy-to-edit support
-- Optional Supabase-backed published Quick Start templates with built-in offline fallback
-- Saved user groups with configurable sets, colors, optional modifiers, locked-dice counting, and combos
-- Create/Edit Group workflow with validation, confirmations, and local persistence
-- Real Play Mode with set rolls, Roll All, combo rolls, expandable dice, temporary locks/modifier states, set history, and Add Combo during play
-- Coin & Random tools with separate local histories
-- Safe JSON export/import for saved group backups
-- Install App / Offline Help screen and production PWA configuration
+## Live Demo
 
-## Technical Decisions
+```text
+https://unrealdice.onrender.com
+```
 
-- React, TypeScript, Vite, and React Router power the client app.
-- Data is local-first: saved groups and histories live in browser storage, not on a server.
-- JSON backups are validated and imported as new IDs to avoid overwriting existing groups.
-- Dice results, expanded sets, and locked dice are session-only play state and are not saved into reusable group definitions.
-- Modifier configuration is saved with sets, while active per-die and set-total modifier states remain play-session state.
-- PWA support uses a service worker for the application shell while user data remains in browser storage.
-- Remote template management, when configured, uses Supabase Auth and RLS; the unlinked studio route is not treated as security.
+## What This Project Shows
+
+- React and TypeScript app structure
+- PWA/offline app foundation
+- local-first browser data handling
+- reusable dice groups and play sessions
+- JSON backup import/export with validation
+- route-based app flow with React Router
+- mobile-friendly product thinking
+- separation between domain logic, services, hooks and UI screens
+
+## Core Features
+
+- saved dice groups with configurable dice sets
+- colors, modifiers and locked-dice counting
+- reusable combo rolls
+- real play mode with Roll All, set rolls and combo rolls
+- expandable dice results and temporary locked states
+- roll history and local tool histories
+- Coin and Random tools for quick decisions
+- Quick Start templates with copy-to-edit support
+- safe JSON export/import for backups
+- install/offline help screen
+- production PWA configuration
+
+## PWA and Offline Behavior
+
+unrealDice is designed as a local-first app. Saved groups and histories live in browser storage, so the app can stay useful without a backend account system.
+
+The PWA setup provides an installable app shell. Production offline behavior should be tested from a built preview or deployed version, not only from the development server.
+
+Important note: browser-local data can be lost if the user clears browser data, removes the app, uses private browsing or resets the device. Export backups are therefore part of the product flow.
+
+## Import and Export
+
+The backup system exports saved groups as JSON. Imports are validated and created with new IDs so existing groups are not overwritten accidentally.
+
+This was an important part of the project because local-first apps need a clear way for users to move or protect their data.
+
+## Tech Stack
+
+- React
+- TypeScript
+- Vite
+- React Router
+- PWA/service worker setup
+- Browser storage
+- Optional Supabase-backed Quick Start templates
+
+## Architecture Overview
+
+```text
+src/app          routing and app-level PWA update handling
+src/screens      route screens for groups, play, tools and help
+src/components   reusable UI components
+src/domain       types, constants, validation and pure utilities
+src/hooks        focused React state/browser interaction hooks
+src/services     storage, backup and history services
+src/content      centralized UI copy
+docs             setup notes and QA documentation
+```
+
+The project separates reusable domain behavior from screen components so dice logic, validation and persistence can be tested and maintained more easily.
 
 ## Screenshots
 
-Screenshots will be added after deployment and real-device verification.
+Repository-local screenshots are still planned. The current portfolio page uses real screenshots captured from the running app and can be used as the visual reference for this project.
+
+Suggested future screenshot set for this README:
+
+- dashboard/home view
+- saved dice group editor
+- play mode with roll result
+- mobile/PWA view
+- import/export flow
 
 ## Getting Started
 
 ```bash
+git clone https://github.com/STU6266/unreal-dice.git
+cd unreal-dice
 npm install
 npm run dev
 ```
 
-## Test, Build, Preview
+## Test, Build and Preview
 
 ```bash
 npm run test
@@ -44,41 +104,39 @@ npm run build
 npm run preview
 ```
 
-## PWA Offline Testing
-
-Production PWA behavior should be tested after:
+Production PWA behavior should be checked after:
 
 ```bash
 npm run build
 npm run preview
 ```
 
-Open the preview URL in Chrome or Edge, inspect the manifest and service worker in DevTools, load the main routes once, enable offline mode, and reload a previously opened route. The normal development server is not proof of installability or offline behavior.
+Then open the preview URL in Chrome or Edge, inspect the manifest and service worker in DevTools, load the main routes once, enable offline mode and reload a previously opened route.
 
-Production hosting should serve `index.html` as the SPA fallback for app routes such as `/groups`, `/random`, and `/play/group/:groupId`.
+Production hosting should serve `index.html` as the SPA fallback for routes such as `/groups`, `/random` and `/play/group/:groupId`.
 
-## Remote Quick Start Studio
+## Optional Remote Quick Start Templates
 
-The public Quick Start screen works without Supabase by using the built-in templates. When Supabase is configured with `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY`, public users can receive published remote templates and cache the last valid published list for offline fallback.
+The public Quick Start screen works without Supabase by using built-in templates.
 
-An unlinked studio route exists at `/studio/templates` for managing remote templates. Admin access depends on Supabase email/password Authentication and Row Level Security policies, not on the route being hidden. See `docs/SUPABASE_STUDIO_SETUP.md` before configuring or deploying this feature.
+When `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` are configured, the app can load published remote templates and cache the last valid list for offline fallback.
 
-## Local Data And Backups
+The unlinked studio route at `/studio/templates` is not security by itself. Admin access depends on Supabase Authentication and Row Level Security policies.
 
-User groups and histories are stored locally in the current browser/device. They can be lost if browser data is cleared, the app is removed, private browsing is used, or the device is reset. Export backups to protect saved group configurations.
+See:
 
-## Architecture Overview
+```text
+docs/SUPABASE_STUDIO_SETUP.md
+```
 
-- `src/app`: routing and app-level PWA update prompt wiring
-- `src/screens`: route screens for Home, groups, import/export, random tools, play, and install help
-- `src/components`: reusable UI pieces for groups, play mode, backup dialogs, random tools, and PWA prompts
-- `src/domain`: types, constants, validation, templates, and pure transformation/engine utilities
-- `src/hooks`: focused React state and browser interaction hooks
-- `src/services`: local storage, backup, random history, and set history services
-- `src/content/en.ts`: centralized English UI copy
-- `docs`: project specification and manual QA checklist
+## Project Scope
 
-## Future Enhancements
+This is a portfolio-ready PWA/tool project focused on practical app UX and local-first data handling.
+
+Possible future improvements:
 
 - German language support
-- Optional native packaging through Capacitor
+- repository-local screenshots
+- more template packs
+- optional native packaging through Capacitor
+- broader automated coverage for backup and play flows
