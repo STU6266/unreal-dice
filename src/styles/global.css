@@ -1276,6 +1276,7 @@ p {
   width: 76%;
   height: 76%;
   display: grid;
+  color: var(--pip-color, currentColor);
   grid-template-columns: repeat(3, 1fr);
   grid-template-rows: repeat(3, 1fr);
 }
@@ -1286,7 +1287,7 @@ p {
   align-self: center;
   justify-self: center;
   border-radius: 50%;
-  background: currentColor;
+  background-color: var(--pip-color, currentColor);
 }
 
 .pip-face--1 .pip-dot:nth-child(1) {

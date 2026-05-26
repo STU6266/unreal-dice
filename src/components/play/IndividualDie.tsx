@@ -32,6 +32,10 @@ export function IndividualDie({
     color: pipColor,
     borderColor: pipColor,
     '--die-color': diceColor,
+    '--pip-color': pipColor,
+  } as CSSProperties
+  const pipStyle = {
+    backgroundColor: pipColor,
   } as CSSProperties
 
   function clearLongPressTimer(): void {
@@ -100,7 +104,7 @@ export function IndividualDie({
       {isUnrolled ? null : sides >= 2 && sides <= 6 ? (
         <span className={`pip-face pip-face--${value}`}>
           {Array.from({ length: value }, (_, index) => (
-            <span key={index} className="pip-dot" />
+            <span key={index} className="pip-dot" style={pipStyle} />
           ))}
         </span>
       ) : (
