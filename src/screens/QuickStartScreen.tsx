@@ -1,12 +1,12 @@
 import { Link } from 'react-router-dom'
 import { GroupSummaryCard } from '../components/groups/GroupSummaryCard'
 import { copy } from '../content/en'
-import { useQuickStartTemplates } from '../hooks/useQuickStartTemplates'
 import { useUserGroups } from '../hooks/useUserGroups'
+import { loadQuickStartTemplates } from '../services/quickStartTemplateService'
 
 export function QuickStartScreen() {
   const { message, error, addCopiedTemplate } = useUserGroups()
-  const { templates, source, message: loadMessage, isLoading } = useQuickStartTemplates()
+  const templates = loadQuickStartTemplates()
 
   return (
     <section className="list-screen" aria-labelledby="quick-start-title">
@@ -26,18 +26,6 @@ export function QuickStartScreen() {
       {error ? (
         <div className="status-message status-message--error" role="alert">
           {error}
-        </div>
-      ) : null}
-
-      {loadMessage ? (
-        <div className="status-message status-message--warning" role="status">
-          {copy.quickStart.remoteFallback(source)}
-        </div>
-      ) : null}
-
-      {isLoading ? (
-        <div className="status-message" role="status">
-          {copy.quickStart.loading}
         </div>
       ) : null}
 

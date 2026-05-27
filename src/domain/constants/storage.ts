@@ -3,7 +3,6 @@ export const STORAGE_KEYS = {
   setHistory: 'unrealDice:setHistory',
   coinFlipHistory: 'unrealDice:coinFlipHistory',
   randomNumberHistory: 'unrealDice:randomNumberHistory',
-  quickStartTemplateCache: 'unrealDice:quickStartTemplateCache',
   userPreferences: 'unrealDice:userPreferences',
 } as const
 

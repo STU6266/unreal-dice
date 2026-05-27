@@ -25,6 +25,12 @@ Use this checklist before deployment and real-device testing.
 ## Quick Start
 
 - [ ] Built-in templates are visible
+- [ ] Add a temporary custom Quick Start template in `src/domain/data/customQuickStartTemplates.ts`
+- [ ] Confirm the custom Quick Start template appears
+- [ ] Play the custom Quick Start template
+- [ ] Copy the custom Quick Start template into My Groups
+- [ ] Export/import the copied custom template if desired
+- [ ] Remove the temporary custom template before final push if it was only for testing
 - [ ] Quick Start Play opens a playable group
 - [ ] Copy creates an editable saved group
 - [ ] Copying the same template again creates a unique name

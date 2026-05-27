@@ -103,7 +103,7 @@ Export is handled through My Groups, not as a separate home action.
 
 ## 6. Quick Start
 
-Quick Start provides built-in read-only dice groups.
+Quick Start provides built-in read-only dice groups and optional code-managed custom templates from `src/domain/data/customQuickStartTemplates.ts`.
 
 Each template supports:
 
@@ -391,7 +391,7 @@ Set Total modifiers apply once after locked-dice counting has produced the base 
 
 Division always rounds upward with `Math.ceil`. Subtraction may produce negative results.
 
-Old saved groups, backups, and remote templates without modifier data must normalize to a disabled modifier.
+Old saved groups, backups, and code-managed Quick Start templates without modifier data must normalize to a disabled modifier.
 
 ## 11. Combo Configuration
 

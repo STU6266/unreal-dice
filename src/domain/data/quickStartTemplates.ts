@@ -2,6 +2,8 @@ import { DEFAULT_SET_COLORS } from '../constants/colors'
 import type { DiceCombo, DiceSet } from '../types/dice'
 import type { DiceGroup } from '../types/groups'
 import { createDisabledModifier } from '../utils/modifierUtils'
+import { mapSimpleQuickStartTemplates } from '../utils/simpleQuickStartTemplateMapper'
+import { customQuickStartTemplates } from './customQuickStartTemplates'
 
 type ReadonlyDiceSet = Readonly<DiceSet>
 type ReadonlyDiceCombo = Readonly<DiceCombo> & {
@@ -37,7 +39,7 @@ function createTemplateSet(
   }
 }
 
-export const QUICK_START_TEMPLATES = [
+export const BUILT_IN_QUICK_START_TEMPLATES = [
   {
     id: 'quick-start-standard-dice',
     name: 'Standard Dice',
@@ -164,3 +166,12 @@ export const QUICK_START_TEMPLATES = [
     updatedAt: TEMPLATE_TIMESTAMP,
   },
 ] as const satisfies readonly ReadonlyQuickStartGroup[]
+
+const builtInTemplateIds = new Set(BUILT_IN_QUICK_START_TEMPLATES.map((template) => template.id))
+
+export const QUICK_START_TEMPLATES = [
+  ...BUILT_IN_QUICK_START_TEMPLATES,
+  ...mapSimpleQuickStartTemplates(customQuickStartTemplates, {
+    reservedTemplateIds: builtInTemplateIds,
+  }),
+] as const satisfies readonly QuickStartTemplate[]

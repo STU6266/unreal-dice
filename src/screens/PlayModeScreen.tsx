@@ -19,7 +19,7 @@ import { loadUserGroups, saveUserGroups } from '../services/storageService'
 import { createPlaySession } from '../domain/utils/playSessionFactory'
 import { loadSetHistory, clearSetHistory } from '../services/setHistoryService'
 import { findQuickStartTemplate } from '../services/quickStartTemplateService'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
 interface PlayModeScreenProps {
   source: 'quick-start' | 'saved'
@@ -27,43 +27,13 @@ interface PlayModeScreenProps {
 
 export function PlayModeScreen({ source }: PlayModeScreenProps) {
   const { groupId } = useParams()
-  const [quickStartGroup, setQuickStartGroup] = useState<QuickStartTemplate | null>(null)
-  const [isLoadingQuickStart, setIsLoadingQuickStart] = useState(source === 'quick-start')
+  const quickStartTemplate = findQuickStartTemplate(groupId)
   const group =
     source === 'quick-start'
-      ? quickStartGroup === null
+      ? quickStartTemplate === undefined
         ? null
-        : cloneQuickStartTemplateToGroup(quickStartGroup)
+        : cloneQuickStartTemplateToGroup(quickStartTemplate)
       : loadUserGroups().find((savedGroup) => savedGroup.id === groupId)
-
-  useEffect(() => {
-    if (source !== 'quick-start') {
-      return
-    }
-
-    let isMounted = true
-    void findQuickStartTemplate(groupId).then((template) => {
-      if (isMounted) {
-        setQuickStartGroup(template ?? null)
-        setIsLoadingQuickStart(false)
-      }
-    })
-
-    return () => {
-      isMounted = false
-    }
-  }, [groupId, source])
-
-  if (isLoadingQuickStart) {
-    return (
-      <section className="placeholder-screen" aria-labelledby="play-loading-title">
-        <div className="placeholder-panel">
-          <p className="eyebrow">{copy.play.eyebrow}</p>
-          <h1 id="play-loading-title">{copy.play.loading}</h1>
-        </div>
-      </section>
-    )
-  }
 
   if (group == null) {
     return (

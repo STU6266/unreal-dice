@@ -57,7 +57,6 @@ This was an important part of the project because local-first apps need a clear 
 - React Router
 - PWA/service worker setup
 - Browser storage
-- Optional Supabase-backed Quick Start templates
 
 ## Architecture Overview
 
@@ -115,18 +114,20 @@ Then open the preview URL in Chrome or Edge, inspect the manifest and service wo
 
 Production hosting should serve `index.html` as the SPA fallback for routes such as `/groups`, `/random` and `/play/group/:groupId`.
 
-## Optional Remote Quick Start Templates
+## Code-Managed Quick Start Templates
 
-The public Quick Start screen works without Supabase by using built-in templates.
-
-When `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` are configured, the app can load published remote templates and cache the last valid list for offline fallback.
-
-The unlinked studio route at `/studio/templates` is not security by itself. Admin access depends on Supabase Authentication and Row Level Security policies.
-
-See:
+Quick Start templates are managed in code. Built-in templates live in the app, and personal custom templates can be added in:
 
 ```text
-docs/SUPABASE_STUDIO_SETUP.md
+src/domain/data/customQuickStartTemplates.ts
+```
+
+To add or edit public Quick Start templates, edit that file, run the checks, commit, and push. Render redeploys from the GitHub repository. No online admin login, Supabase project, or frontend-only password screen is required.
+
+Full guide:
+
+```text
+docs/QUICK_START_TEMPLATE_GUIDE.md
 ```
 
 ## Project Scope
