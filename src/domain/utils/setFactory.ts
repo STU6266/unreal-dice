@@ -1,6 +1,7 @@
 import { DEFAULT_SET_COLORS } from '../constants/colors'
-import type { DiceModifier, DiceSet } from '../types/dice'
+import type { DiceModifier, DiceSet, SymbolDieDefinition } from '../types/dice'
 import { copyModifier, createDisabledModifier, normalizeDiceModifier } from './modifierUtils'
+import { copySymbolDice } from './symbolDiceUtils'
 
 export interface SetInput {
   id?: string
@@ -10,6 +11,7 @@ export interface SetInput {
   diceColor: string
   pipColor: string
   modifier: DiceModifier
+  symbolDice: SymbolDieDefinition[]
 }
 
 export function createEmptySetInput(): SetInput {
@@ -20,6 +22,7 @@ export function createEmptySetInput(): SetInput {
     diceColor: DEFAULT_SET_COLORS.diceColor,
     pipColor: DEFAULT_SET_COLORS.pipColor,
     modifier: createDisabledModifier(),
+    symbolDice: [],
   }
 }
 
@@ -36,6 +39,7 @@ export function createSetFromInput(
     diceColor: input.diceColor,
     pipColor: input.pipColor,
     modifier: copyModifier(input.modifier),
+    symbolDice: copySymbolDice(input.symbolDice),
   }
 }
 
@@ -48,6 +52,7 @@ export function createSetInputFromSet(set: DiceSet): SetInput {
     diceColor: set.diceColor,
     pipColor: set.pipColor,
     modifier: normalizeDiceModifier(set.modifier),
+    symbolDice: copySymbolDice(set.symbolDice),
   }
 }
 

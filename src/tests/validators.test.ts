@@ -83,6 +83,102 @@ describe('validators', () => {
     expect(set?.modifier.enabled).toBe(false)
   })
 
+  it('normalizes old sets without symbol dice to numeric dice only', () => {
+    const set = normalizeDiceSet({
+      id: 'old-set',
+      name: 'Old Set',
+      diceCount: 1,
+      sides: 6,
+      diceColor: '#ffffff',
+      pipColor: '#000000',
+    })
+
+    expect(set?.symbolDice).toEqual([])
+  })
+
+  it('allows zero numeric dice when symbol dice exist', () => {
+    const result = validateDiceSet(
+      createTestSet({
+        diceCount: 0,
+        symbolDice: [
+          {
+            id: 'symbol-1',
+            faces: [
+              { type: 'letter', value: 'A' },
+              { type: 'letter', value: 'K' },
+            ],
+          },
+        ],
+      }),
+    )
+
+    expect(result.isValid).toBe(true)
+  })
+
+  it('rejects sets without numeric or symbol dice', () => {
+    const result = validateDiceSet(createTestSet({ diceCount: 0, symbolDice: [] }))
+
+    expect(result.isValid).toBe(false)
+  })
+
+  it('validates symbol die face limits and allows duplicates', () => {
+    const duplicateFaces = [
+      { type: 'letter', value: 'A' },
+      { type: 'letter', value: 'A' },
+    ] as const
+
+    expect(
+      validateDiceSet(
+        createTestSet({
+          diceCount: 0,
+          symbolDice: [{ id: 'symbol-1', faces: [...duplicateFaces] }],
+        }),
+      ).isValid,
+    ).toBe(true)
+    expect(
+      validateDiceSet(
+        createTestSet({
+          diceCount: 0,
+          symbolDice: [{ id: 'symbol-1', faces: [{ type: 'letter', value: 'A' }] }],
+        }),
+      ).isValid,
+    ).toBe(false)
+  })
+
+  it('allows number symbol faces from 0 through 100 and rejects values outside that range', () => {
+    const validResult = validateDiceSet(
+      createTestSet({
+        diceCount: 0,
+        symbolDice: [
+          {
+            id: 'symbol-1',
+            faces: [
+              { type: 'number', value: 0, countsTowardTotal: true },
+              { type: 'number', value: 100, countsTowardTotal: true },
+            ],
+          },
+        ],
+      }),
+    )
+    const invalidResult = validateDiceSet(
+      createTestSet({
+        diceCount: 0,
+        symbolDice: [
+          {
+            id: 'symbol-1',
+            faces: [
+              { type: 'number', value: -1, countsTowardTotal: true },
+              { type: 'number', value: 101, countsTowardTotal: true },
+            ],
+          },
+        ],
+      }),
+    )
+
+    expect(validResult.isValid).toBe(true)
+    expect(invalidResult.isValid).toBe(false)
+  })
+
   it('rejects a group with duplicate set IDs', () => {
     const result = validateDiceGroup(
       createTestGroup({

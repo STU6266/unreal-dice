@@ -55,7 +55,7 @@ export function usePlaySession(
           set,
           nextSetState.diceResults,
           group.lockedDiceCounting,
-          nextSetState.total ?? 0,
+          nextSetState.total,
           undefined,
           undefined,
           nextSetState.setModifierActive,
@@ -77,7 +77,7 @@ export function usePlaySession(
       const nextSession = rollAllSets(group, current)
       group.sets.forEach((set) => {
         const setState = nextSession.setStates[set.id]
-        if (setState !== undefined && setState.total !== null) {
+        if (setState !== undefined) {
           addSetHistoryEntry(
             createSetHistoryEntry(
               set,
@@ -106,7 +106,7 @@ export function usePlaySession(
       combo.setIds.forEach((setId) => {
         const set = group.sets.find((item) => item.id === setId)
         const setState = nextSession.setStates[setId]
-        if (set !== undefined && setState !== undefined && setState.total !== null) {
+        if (set !== undefined && setState !== undefined) {
           addSetHistoryEntry(
             createSetHistoryEntry(
               set,
@@ -128,21 +128,35 @@ export function usePlaySession(
     setSession((current) => {
       const setState = current.setStates[setId]
       const set = group.sets.find((item) => item.id === setId)
+      const totalDiceCount = set === undefined ? 0 : set.diceCount + set.symbolDice.length
 
-      if (setState === undefined || set === undefined || dieIndex >= set.diceCount) {
+      if (setState === undefined || set === undefined || dieIndex >= totalDiceCount) {
         return current
       }
 
       const diceResults: IndividualDieResult[] =
         setState.diceResults.length > 0
           ? setState.diceResults
-          : Array.from({ length: set.diceCount }, () => ({
-              value: 0,
-              mode:
-                set.modifier.enabled && set.modifier.application === 'each-die'
-                  ? 'modifier-active'
-                  : 'normal',
-            }))
+          : [
+              ...Array.from({ length: set.diceCount }, () => ({
+                value: 0,
+                resultType: 'numeric' as const,
+                mode:
+                  set.modifier.enabled && set.modifier.application === 'each-die'
+                    ? 'modifier-active' as const
+                    : 'normal' as const,
+              })),
+              ...set.symbolDice.map((symbolDie) => ({
+                value: 0,
+                resultType: 'symbol' as const,
+                symbolDieId: symbolDie.id,
+                symbolFace: undefined,
+                mode:
+                  set.modifier.enabled && set.modifier.application === 'each-die'
+                    ? 'modifier-active' as const
+                    : 'normal' as const,
+              })),
+            ]
 
       return {
         ...current,

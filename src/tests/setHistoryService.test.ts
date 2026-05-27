@@ -97,4 +97,42 @@ describe('setHistoryService', () => {
     expect(entry.lockedDiceCounting).toBe('include')
     expect(entry.total).toBe(6)
   })
+
+  it('history entry preserves symbol face snapshots and countable status', () => {
+    const entry = createSetHistoryEntry(
+      createTestSet({
+        id: 'set-1',
+        diceCount: 0,
+        symbolDice: [
+          {
+            id: 'symbol-1',
+            faces: [
+              { type: 'number', value: 5, countsTowardTotal: true },
+              { type: 'letter', value: 'A' },
+            ],
+          },
+        ],
+      }),
+      [
+        {
+          value: 5,
+          mode: 'locked',
+          resultType: 'symbol',
+          symbolDieId: 'symbol-1',
+          symbolFace: { type: 'number', value: 5, countsTowardTotal: true },
+        },
+      ],
+      'include',
+      5,
+      () => 'entry-symbol',
+      () => '2026-05-23T10:00:00.000Z',
+    )
+
+    expect(entry.diceResults[0]?.symbolFace).toEqual({
+      type: 'number',
+      value: 5,
+      countsTowardTotal: true,
+    })
+    expect(entry.diceResults[0]?.mode).toBe('locked')
+  })
 })

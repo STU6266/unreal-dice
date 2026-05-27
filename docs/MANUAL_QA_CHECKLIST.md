@@ -46,6 +46,9 @@ Use this checklist before deployment and real-device testing.
 - [ ] Set colors and names display correctly
 - [ ] Low-contrast set colors show a warning
 - [ ] Optional set modifiers can be enabled, validated, saved, edited, and removed
+- [ ] Create a set with 0 numeric dice and 1 symbol die
+- [ ] Add icon, letter, number, and color symbol faces
+- [ ] Create a mixed set with numeric dice and symbol dice
 
 ## Combos
 
@@ -94,6 +97,10 @@ Use this checklist before deployment and real-device testing.
 - [ ] Large set die darkens when any die in the set is locked
 - [ ] Set history shows latest rolls and marks locked dice with X
 - [ ] Modifier-enabled history entries show per-die modifier state or set-total modifier notes
+- [ ] Pure non-countable symbol sets roll and show `—` as the large set result
+- [ ] Countable symbol number faces contribute to set, Roll All, and combo totals
+- [ ] Symbol dice lock, darken, retain their face, and appear correctly in history
+- [ ] Dice Poker appears in Quick Start and plays
 - [ ] Clearing one set history does not clear another set history
 - [ ] Add Combo during saved-group play preserves current results and locks
 - [ ] Quick Start Copy to Edit creates an editable copy without copying temporary roll state

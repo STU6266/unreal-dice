@@ -3,6 +3,7 @@ import type { QuickStartTemplate } from '../data/quickStartTemplates'
 import type { DiceCombo, DiceSet } from '../types/dice'
 import type { DiceGroup } from '../types/groups'
 import { copyModifier, normalizeDiceModifier } from './modifierUtils'
+import { copySymbolDice } from './symbolDiceUtils'
 import { createUniqueCopyName } from './uniqueNames'
 
 export type AddQuickStartCopyResult =
@@ -72,6 +73,7 @@ function copySet(set: Readonly<DiceSet>, id: string): DiceSet {
     diceColor: set.diceColor,
     pipColor: set.pipColor,
     modifier: copyModifier(normalizeDiceModifier(set.modifier)),
+    symbolDice: copySymbolDice(set.symbolDice),
   }
 }
 

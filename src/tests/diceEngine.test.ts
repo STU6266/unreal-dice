@@ -327,4 +327,201 @@ describe('diceEngine', () => {
 
     expect(total).toBe(12)
   })
+
+  it('rolls symbol dice and returns no total for pure non-countable symbols', () => {
+    const state = rollSet(
+      createTestSet({
+        diceCount: 0,
+        symbolDice: [
+          {
+            id: 'symbol-1',
+            faces: [
+              { type: 'letter', value: 'A' },
+              { type: 'letter', value: 'K' },
+            ],
+          },
+        ],
+      }),
+      undefined,
+      'include',
+      () => 0,
+    )
+
+    expect(state.diceResults[0]?.symbolFace).toEqual({ type: 'letter', value: 'A' })
+    expect(state.total).toBeNull()
+  })
+
+  it('locked symbol dice retain their rolled face', () => {
+    const state = rollSet(
+      createTestSet({
+        diceCount: 0,
+        symbolDice: [
+          {
+            id: 'symbol-1',
+            faces: [
+              { type: 'letter', value: 'A' },
+              { type: 'letter', value: 'K' },
+            ],
+          },
+        ],
+      }),
+      {
+        setId: 'set-1',
+        isExpanded: true,
+        total: null,
+        setModifierActive: false,
+        diceResults: [
+          {
+            value: 0,
+            mode: 'locked',
+            resultType: 'symbol',
+            symbolDieId: 'symbol-1',
+            symbolFace: { type: 'letter', value: 'K' },
+          },
+        ],
+      },
+      'include',
+      () => 0,
+    )
+
+    expect(state.diceResults[0]?.symbolFace).toEqual({ type: 'letter', value: 'K' })
+  })
+
+  it('mixed set total includes numeric dice and countable number faces', () => {
+    const state = rollSet(
+      createTestSet({
+        diceCount: 2,
+        sides: 6,
+        symbolDice: [
+          {
+            id: 'symbol-1',
+            faces: [
+              { type: 'number', value: 5, countsTowardTotal: true },
+              { type: 'letter', value: 'A' },
+            ],
+          },
+        ],
+      }),
+      undefined,
+      'include',
+      createRandomSequence([0, 0.5, 0]),
+    )
+
+    expect(state.total).toBe(10)
+  })
+
+  it('non-countable number and color faces do not contribute to totals', () => {
+    const state = rollSet(
+      createTestSet({
+        diceCount: 0,
+        symbolDice: [
+          {
+            id: 'symbol-1',
+            faces: [
+              { type: 'number', value: 100, countsTowardTotal: false },
+              { type: 'color', value: '#dc2626', label: 'Red' },
+            ],
+          },
+        ],
+      }),
+      undefined,
+      'include',
+      () => 0,
+    )
+
+    expect(state.total).toBeNull()
+  })
+
+  it('each-die modifier applies to countable symbol number faces', () => {
+    const total = calculateModifiedSetTotal(
+      [
+        {
+          value: 5,
+          mode: 'modifier-active',
+          resultType: 'symbol',
+          symbolFace: { type: 'number', value: 5, countsTowardTotal: true },
+        },
+        {
+          value: 0,
+          mode: 'modifier-active',
+          resultType: 'symbol',
+          symbolFace: { type: 'letter', value: 'A' },
+        },
+      ],
+      createTestSet({ diceCount: 0, modifier: eachDieMultiplyModifier }),
+      'include',
+      false,
+    )
+
+    expect(total).toBe(10)
+  })
+
+  it('set-total modifier does not create a total for non-countable symbol results', () => {
+    const total = calculateModifiedSetTotal(
+      [
+        {
+          value: 0,
+          mode: 'normal',
+          resultType: 'symbol',
+          symbolFace: { type: 'letter', value: 'A' },
+        },
+      ],
+      createTestSet({ diceCount: 0, modifier: setTotalDivideModifier }),
+      'include',
+      true,
+    )
+
+    expect(total).toBeNull()
+  })
+
+  it('Roll All ignores symbol-only non-countable sets in the combined total while rolling them', () => {
+    const group = createTestGroup({
+      sets: [
+        createTestSet({ id: 'set-1', diceCount: 1 }),
+        createTestSet({
+          id: 'set-2',
+          diceCount: 0,
+          symbolDice: [
+            {
+              id: 'symbol-1',
+              faces: [
+                { type: 'letter', value: 'A' },
+                { type: 'letter', value: 'K' },
+              ],
+            },
+          ],
+        }),
+      ],
+    })
+
+    const session = rollAllSets(group, createPlaySession(group), () => 0)
+
+    expect(session.lastRollAllTotal).toBe(1)
+    expect(session.setStates['set-2']?.diceResults).toHaveLength(1)
+  })
+
+  it('combo with only non-countable symbol results keeps a neutral total', () => {
+    const group = createTestGroup({
+      sets: [
+        createTestSet({
+          id: 'set-1',
+          diceCount: 0,
+          symbolDice: [
+            {
+              id: 'symbol-1',
+              faces: [
+                { type: 'letter', value: 'A' },
+                { type: 'letter', value: 'K' },
+              ],
+            },
+          ],
+        }),
+      ],
+      combos: [createTestCombo({ id: 'combo-1', setIds: ['set-1'] })],
+    })
+
+    const session = rollComboSets(group, createPlaySession(group), 'combo-1', () => 0)
+
+    expect(session.comboTotals['combo-1']).toBeNull()
+  })
 })

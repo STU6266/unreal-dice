@@ -12,6 +12,7 @@ export function createTestSet(overrides: Partial<DiceSet> = {}): DiceSet {
     diceColor: DEFAULT_SET_COLORS.diceColor,
     pipColor: DEFAULT_SET_COLORS.pipColor,
     modifier: createDisabledModifier(),
+    symbolDice: [],
     ...overrides,
   }
 }

@@ -23,7 +23,7 @@ https://unrealdice.onrender.com
 
 ## Core Features
 
-- saved dice groups with configurable dice sets
+- saved dice groups with configurable numeric, symbol, and mixed dice sets
 - colors, modifiers and locked-dice counting
 - reusable combo rolls
 - real play mode with Roll All, set rolls and combo rolls

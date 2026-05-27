@@ -52,6 +52,7 @@ Sets may include:
 - `diceColor`
 - `pipColor`
 - `modifier`
+- `symbolDice`
 
 Combos may include:
 
@@ -67,8 +68,10 @@ If omitted, templates use `"exclude"`.
 
 ## Limits
 
-- Dice per set: 1 to 30
+- Numeric dice per set: 0 to 30
 - Sides per die: 2 to 100
+- Total numeric plus symbol dice per set: 1 to 30
+- Faces per symbol die: 2 to 30
 - Sets per group: up to 40
 - Combos per group: up to 20
 - Sets inside one combo: up to 20
@@ -205,6 +208,209 @@ A set can belong to only one combo.
         value: 2,
         application: 'set-total',
       },
+    },
+  ],
+}
+```
+
+### Simple Symbol Die
+
+```ts
+{
+  name: 'Story Die',
+  sets: [
+    {
+      name: 'Story',
+      dice: 0,
+      sides: 6,
+      symbolDice: [
+        {
+          faces: [
+            { type: 'icon', symbol: 'Danger', label: 'Danger' },
+            { type: 'icon', symbol: 'Treasure', label: 'Treasure' },
+            { type: 'letter', value: 'A' },
+            { type: 'color', value: '#dc2626', label: 'Red' },
+          ],
+        },
+      ],
+    },
+  ],
+}
+```
+
+### Dice Poker
+
+```ts
+{
+  name: 'Dice Poker',
+  lockedDiceCounting: 'include',
+  sets: [
+    {
+      name: 'Poker Dice',
+      dice: 0,
+      sides: 6,
+      symbolDice: [
+        {
+          faces: [
+            { type: 'number', value: 9, countsTowardTotal: false },
+            { type: 'number', value: 10, countsTowardTotal: false },
+            { type: 'letter', value: 'J' },
+            { type: 'letter', value: 'Q' },
+            { type: 'letter', value: 'K' },
+            { type: 'letter', value: 'A' },
+          ],
+        },
+      ],
+    },
+  ],
+}
+```
+
+Add more symbol dice by copying the object inside `symbolDice`.
+
+### Weighted Symbol Die
+
+Duplicate faces are allowed:
+
+```ts
+{
+  name: 'Weighted Weather',
+  sets: [
+    {
+      name: 'Weather',
+      dice: 0,
+      sides: 6,
+      symbolDice: [
+        {
+          faces: [
+            { type: 'icon', symbol: 'Sun', label: 'Sun' },
+            { type: 'icon', symbol: 'Sun', label: 'Sun' },
+            { type: 'icon', symbol: 'Rain', label: 'Rain' },
+            { type: 'icon', symbol: 'Lightning', label: 'Lightning' },
+          ],
+        },
+      ],
+    },
+  ],
+}
+```
+
+### Countable Number Face
+
+```ts
+{
+  name: 'Loot Value',
+  sets: [
+    {
+      name: 'Loot',
+      dice: 0,
+      sides: 6,
+      symbolDice: [
+        {
+          faces: [
+            { type: 'number', value: 0, countsTowardTotal: true },
+            { type: 'number', value: 5, countsTowardTotal: true },
+            { type: 'number', value: 10, countsTowardTotal: true },
+          ],
+        },
+      ],
+    },
+  ],
+}
+```
+
+### Visual Number Face
+
+```ts
+{
+  name: 'Poker Rank',
+  sets: [
+    {
+      name: 'Rank',
+      dice: 0,
+      sides: 6,
+      symbolDice: [
+        {
+          faces: [
+            { type: 'number', value: 9, countsTowardTotal: false },
+            { type: 'number', value: 10, countsTowardTotal: false },
+            { type: 'letter', value: 'J' },
+          ],
+        },
+      ],
+    },
+  ],
+}
+```
+
+### Mixed Numeric And Symbol Set
+
+```ts
+{
+  name: 'Attack With Effect',
+  sets: [
+    {
+      name: 'Attack',
+      dice: 2,
+      sides: 6,
+      symbolDice: [
+        {
+          faces: [
+            { type: 'icon', symbol: 'Fire', label: 'Fire' },
+            { type: 'icon', symbol: 'Ice', label: 'Ice' },
+            { type: 'number', value: 2, countsTowardTotal: true },
+          ],
+        },
+      ],
+    },
+  ],
+}
+```
+
+### Color Faces
+
+```ts
+{
+  name: 'Color Choice',
+  sets: [
+    {
+      name: 'Color',
+      dice: 0,
+      sides: 6,
+      symbolDice: [
+        {
+          faces: [
+            { type: 'color', value: '#dc2626', label: 'Red' },
+            { type: 'color', value: '#2563eb', label: 'Blue' },
+            { type: 'color', value: '#16a34a', label: 'Green' },
+          ],
+        },
+      ],
+    },
+  ],
+}
+```
+
+### Letter Faces
+
+```ts
+{
+  name: 'Letter Die',
+  sets: [
+    {
+      name: 'Letter',
+      dice: 0,
+      sides: 6,
+      symbolDice: [
+        {
+          faces: [
+            { type: 'letter', value: 'A' },
+            { type: 'letter', value: 'B' },
+            { type: 'letter', value: 'Ä' },
+            { type: 'letter', value: 'ß' },
+          ],
+        },
+      ],
     },
   ],
 }

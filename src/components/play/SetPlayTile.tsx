@@ -4,6 +4,7 @@ import type { DiceSet } from '../../domain/types/dice'
 import type { IndividualDieMode } from '../../domain/types/history'
 import type { SetPlayState } from '../../domain/types/session'
 import { normalizeDieMode } from '../../domain/utils/modifierUtils'
+import { getSymbolFaceDisplay } from '../../domain/utils/symbolDiceUtils'
 import { IndividualDie } from './IndividualDie'
 import { LargeResultDie } from './LargeResultDie'
 
@@ -40,8 +41,9 @@ export function SetPlayTile({
   const diceForDisplay =
     state.diceResults.length > 0
       ? state.diceResults
-      : Array.from({ length: set.diceCount }, () => null)
-  const isSingleDieSet = set.diceCount === 1
+      : Array.from({ length: set.diceCount + set.symbolDice.length }, () => null)
+  const totalDiceCount = set.diceCount + set.symbolDice.length
+  const isSingleDieSet = totalDiceCount === 1
   const modifierSummary = set.modifier.enabled
     ? set.modifier.application === 'each-die'
       ? copy.groupEditor.setDialog.modifierSummary.eachDie(
@@ -86,6 +88,7 @@ export function SetPlayTile({
                 key={index}
                 value={die?.value ?? null}
                 sides={set.sides}
+                symbolFace={die?.symbolFace}
                 diceColor={set.diceColor}
                 pipColor={set.pipColor}
                 mode={getDisplayMode(die, hasEachDieModifier)}
@@ -93,7 +96,7 @@ export function SetPlayTile({
                   set.name,
                   index + 1,
                   getDisplayMode(die, hasEachDieModifier),
-                )}
+                ) + getResultLabel(die)}
                 onToggleLocked={() => onToggleDieLocked(index)}
               />
             ))}
@@ -131,6 +134,7 @@ export function SetPlayTile({
               key={index}
               value={die?.value ?? null}
               sides={set.sides}
+              symbolFace={die?.symbolFace}
               diceColor={set.diceColor}
               pipColor={set.pipColor}
               mode={getDisplayMode(die, hasEachDieModifier)}
@@ -138,7 +142,7 @@ export function SetPlayTile({
                 set.name,
                 index + 1,
                 getDisplayMode(die, hasEachDieModifier),
-              )}
+              ) + getResultLabel(die)}
               onToggleLocked={() => onToggleDieLocked(index)}
             />
           ))}
@@ -146,6 +150,18 @@ export function SetPlayTile({
       ) : null}
     </article>
   )
+}
+
+function getResultLabel(die: { value?: number; symbolFace?: unknown } | null): string {
+  if (die === null) {
+    return ''
+  }
+
+  if (die.symbolFace !== undefined && typeof die.symbolFace === 'object' && die.symbolFace !== null) {
+    return ` Result: ${getSymbolFaceDisplay(die.symbolFace as Parameters<typeof getSymbolFaceDisplay>[0])}.`
+  }
+
+  return die.value === undefined || die.value === 0 ? '' : ` Result: ${die.value}.`
 }
 
 function getDisplayMode(

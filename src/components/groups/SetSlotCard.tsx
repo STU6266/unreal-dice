@@ -21,7 +21,7 @@ export function SetSlotCard({
 }: SetSlotCardProps) {
   const set = slot.set
   const title = set?.name || `Set ${position}`
-  const formula = set ? `${set.diceCount}d${set.sides}` : copy.groupEditor.setSlot.empty
+  const formula = set ? getSetFormula(set.diceCount, set.sides, set.symbolDice.length) : copy.groupEditor.setSlot.empty
   const modifierSummary =
     set?.modifier.enabled === true
       ? set.modifier.application === 'each-die'
@@ -78,4 +78,10 @@ export function SetSlotCard({
       </div>
     </article>
   )
+}
+
+function getSetFormula(diceCount: number, sides: number, symbolDiceCount: number): string {
+  const numericPart = diceCount > 0 ? `${diceCount}d${sides}` : ''
+  const symbolPart = symbolDiceCount > 0 ? `${symbolDiceCount} symbol` : ''
+  return [numericPart, symbolPart].filter(Boolean).join(' + ')
 }

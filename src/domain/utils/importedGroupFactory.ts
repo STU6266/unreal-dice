@@ -2,6 +2,7 @@ import { APP_LIMITS } from '../constants/limits'
 import type { DiceCombo, DiceSet } from '../types/dice'
 import type { DiceGroup } from '../types/groups'
 import { copyModifier, normalizeDiceModifier } from './modifierUtils'
+import { copySymbolDice } from './symbolDiceUtils'
 
 export type ImportedGroupsResult =
   | { ok: true; groups: DiceGroup[] }
@@ -88,6 +89,7 @@ function createImportedSet(set: DiceSet, id: string): DiceSet {
     diceColor: set.diceColor,
     pipColor: set.pipColor,
     modifier: copyModifier(normalizeDiceModifier(set.modifier)),
+    symbolDice: copySymbolDice(set.symbolDice),
   }
 }
 

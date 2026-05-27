@@ -347,8 +347,9 @@ Each set contains:
 
 - unique ID
 - name
-- dice count
-- sides per die
+- numeric dice count
+- sides per numeric die
+- optional symbol dice
 - dice body color
 - number/dot color
 - history
@@ -356,10 +357,26 @@ Each set contains:
 ### Rules
 
 - Set name is optional. If left empty, create a default such as `Set 1`.
-- Dice count is required and must be between 1 and 30.
-- Sides are required and must be between 2 and 100.
+- Numeric dice count must be between 0 and 30.
+- Sides are required when numeric dice count is greater than 0 and must be between 2 and 100.
+- A set is valid when numeric dice plus symbol dice is at least 1 and at most 30.
 - Dice body color is editable.
 - Number/dot color is editable.
+
+### Symbol Dice
+
+Version 1.3 supports symbol dice inside sets. A set can contain numeric dice, symbol dice, or both.
+
+Symbol dice have 2 to 30 custom faces. Duplicate faces are allowed for weighted outcomes.
+
+Supported symbol faces:
+
+- icon faces
+- one-letter faces including A-Z, Ä, Ö, Ü and ß
+- number faces from 0 to 100
+- color faces
+
+Only numeric dice and symbol number faces marked as counting toward totals contribute to set totals, Roll All totals, combo totals, and modifiers. Icon, letter, color, and non-countable number faces are visual only.
 
 ### Default Set Colors
 

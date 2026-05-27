@@ -8,8 +8,10 @@ import type {
   LockedDiceCounting,
   ModifierApplication,
   ModifierOperator,
+  SymbolDieDefinition,
 } from '../types/dice'
 import { createDisabledModifier, isValidDiceModifier } from './modifierUtils'
+import { normalizeSymbolDice } from './symbolDiceUtils'
 
 export interface SimpleQuickStartTemplate {
   name: string
@@ -26,6 +28,11 @@ export interface SimpleQuickStartSet {
   diceColor?: string
   pipColor?: string
   modifier?: SimpleModifierConfig
+  symbolDice?: SimpleSymbolDieConfig[]
+}
+
+export interface SimpleSymbolDieConfig {
+  faces: SymbolDieDefinition['faces']
 }
 
 export interface SimpleQuickStartCombo {
@@ -114,12 +121,18 @@ function mapSimpleSet(templateId: string, set: SimpleQuickStartSet): DiceSet | n
     typeof set.name !== 'string' ||
     set.name.trim() === '' ||
     !Number.isInteger(set.dice) ||
-    set.dice < 1 ||
+    set.dice < 0 ||
     set.dice > APP_LIMITS.maxDicePerSet ||
-    !Number.isInteger(set.sides) ||
-    set.sides < APP_LIMITS.minSidesPerDie ||
-    set.sides > APP_LIMITS.maxSidesPerDie
+    (set.dice > 0 &&
+      (!Number.isInteger(set.sides) ||
+        set.sides < APP_LIMITS.minSidesPerDie ||
+        set.sides > APP_LIMITS.maxSidesPerDie))
   ) {
+    return null
+  }
+
+  const symbolDice = normalizeSimpleSymbolDice(`${templateId}-${createSlug(set.name)}`, set.symbolDice)
+  if (symbolDice === null || set.dice + symbolDice.length < 1 || set.dice + symbolDice.length > APP_LIMITS.maxDicePerSet) {
     return null
   }
 
@@ -136,7 +149,29 @@ function mapSimpleSet(templateId: string, set: SimpleQuickStartSet): DiceSet | n
     diceColor: set.diceColor ?? DEFAULT_SET_COLORS.diceColor,
     pipColor: set.pipColor ?? DEFAULT_SET_COLORS.pipColor,
     modifier,
+    symbolDice,
   }
+}
+
+function normalizeSimpleSymbolDice(
+  setId: string,
+  symbolDice: readonly SimpleSymbolDieConfig[] | undefined,
+): SymbolDieDefinition[] | null {
+  if (symbolDice === undefined) {
+    return []
+  }
+
+  const normalized = normalizeSymbolDice(
+    symbolDice.map((die, index) => ({
+      id: `${setId}-symbol-${index + 1}`,
+      faces: die.faces,
+    })),
+  )
+
+  return normalized.length === symbolDice.length &&
+    normalized.every((die) => die.faces.length >= 2 && die.faces.length <= 30)
+    ? normalized
+    : null
 }
 
 function mapSimpleModifier(modifier: SimpleModifierConfig | undefined): DiceModifier | null {

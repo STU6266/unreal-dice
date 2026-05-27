@@ -62,6 +62,26 @@ describe('storageService', () => {
     expect(loadUserGroups(storage)[0]?.sets[0]?.modifier.enabled).toBe(false)
   })
 
+  it('loads old stored groups without symbol dice by adding an empty symbol dice list', () => {
+    const storage = new InMemoryStorage()
+    const group = createTestGroup()
+    const oldGroup = {
+      ...group,
+      sets: group.sets.map((set) => {
+        const oldSet: Partial<typeof set> = { ...set }
+        delete oldSet.symbolDice
+        return oldSet
+      }),
+    }
+
+    storage.setItem(
+      STORAGE_KEYS.userGroups,
+      JSON.stringify(createStoredUserGroupsData([oldGroup as typeof group])),
+    )
+
+    expect(loadUserGroups(storage)[0]?.sets[0]?.symbolDice).toEqual([])
+  })
+
   it('returns an empty array for invalid stored JSON without crashing', () => {
     const storage = new InMemoryStorage()
     storage.setItem(STORAGE_KEYS.userGroups, '{broken json')

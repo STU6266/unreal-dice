@@ -1,9 +1,10 @@
 import { APP_LIMITS } from '../constants/limits'
 import { DATA_SCHEMA_VERSION } from '../constants/storage'
-import type { DiceCombo, DiceModifier, DiceSet, LockedDiceCounting } from '../types/dice'
+import type { DiceCombo, DiceModifier, DiceSet, LockedDiceCounting, SymbolDieDefinition } from '../types/dice'
 import type { DiceGroup, GroupSource } from '../types/groups'
 import type { StoredUserGroupsData } from '../types/storage'
 import { normalizeDiceModifier, isValidDiceModifier } from '../utils/modifierUtils'
+import { MAX_SYMBOL_FACES_PER_DIE, normalizeSymbolDice } from '../utils/symbolDiceUtils'
 import {
   createValidationResult,
   type ValidationIssue,
@@ -46,23 +47,37 @@ export function validateDiceSet(
     issues.push({ path: `${path}.name`, message: 'Set name must be a string.' })
   }
 
-  if (!isIntegerInRange(value.diceCount, 1, APP_LIMITS.maxDicePerSet)) {
+  const symbolDiceCount = Array.isArray(value.symbolDice) ? value.symbolDice.length : 0
+  const numericDiceCount = typeof value.diceCount === 'number' ? value.diceCount : NaN
+
+  if (!isIntegerInRange(value.diceCount, 0, APP_LIMITS.maxDicePerSet)) {
     issues.push({
       path: `${path}.diceCount`,
-      message: `Dice count must be an integer between 1 and ${APP_LIMITS.maxDicePerSet}.`,
+      message: `Numeric dice count must be an integer between 0 and ${APP_LIMITS.maxDicePerSet}.`,
+    })
+  }
+
+  if (numericDiceCount > 0 && !isIntegerInRange(value.sides, APP_LIMITS.minSidesPerDie, APP_LIMITS.maxSidesPerDie)) {
+    issues.push({
+      path: `${path}.sides`,
+      message: `Sides must be an integer between ${APP_LIMITS.minSidesPerDie} and ${APP_LIMITS.maxSidesPerDie}.`,
     })
   }
 
   if (
-    !isIntegerInRange(
-      value.sides,
-      APP_LIMITS.minSidesPerDie,
-      APP_LIMITS.maxSidesPerDie,
-    )
+    Number.isInteger(numericDiceCount) &&
+    symbolDiceCount + numericDiceCount < 1
+  ) {
+    issues.push({ path, message: 'A set must contain at least one die.' })
+  }
+
+  if (
+    Number.isInteger(numericDiceCount) &&
+    symbolDiceCount + numericDiceCount > APP_LIMITS.maxDicePerSet
   ) {
     issues.push({
-      path: `${path}.sides`,
-      message: `Sides must be an integer between ${APP_LIMITS.minSidesPerDie} and ${APP_LIMITS.maxSidesPerDie}.`,
+      path,
+      message: `A set cannot contain more than ${APP_LIMITS.maxDicePerSet} total dice.`,
     })
   }
 
@@ -85,6 +100,77 @@ export function validateDiceSet(
     !isValidDiceModifier(value.modifier)
   ) {
     issues.push(...validateDiceModifier(value.modifier, `${path}.modifier`).issues)
+  }
+
+  if (value.symbolDice !== undefined) {
+    issues.push(...validateSymbolDice(value.symbolDice, `${path}.symbolDice`).issues)
+  }
+
+  return createValidationResult(issues)
+}
+
+export function validateSymbolDice(value: unknown, path = 'symbolDice'): ValidationResult {
+  const issues: ValidationIssue[] = []
+
+  if (!Array.isArray(value)) {
+    return createValidationResult([{ path, message: 'Symbol dice must be an array.' }])
+  }
+
+  value.forEach((die, index) => {
+    const diePath = `${path}[${index}]`
+    if (!isRecord(die)) {
+      issues.push({ path: diePath, message: 'Symbol die must be an object.' })
+      return
+    }
+
+    addNonEmptyStringIssue(issues, die.id, `${diePath}.id`, 'Symbol die ID is required.')
+
+    if (!Array.isArray(die.faces)) {
+      issues.push({ path: `${diePath}.faces`, message: 'Symbol die faces must be an array.' })
+      return
+    }
+
+    if (die.faces.length < 2 || die.faces.length > MAX_SYMBOL_FACES_PER_DIE) {
+      issues.push({
+        path: `${diePath}.faces`,
+        message: `Symbol dice need 2 to ${MAX_SYMBOL_FACES_PER_DIE} faces.`,
+      })
+    }
+
+    die.faces.forEach((face, faceIndex) => {
+      issues.push(...validateSymbolFace(face, `${diePath}.faces[${faceIndex}]`).issues)
+    })
+  })
+
+  return createValidationResult(issues)
+}
+
+function validateSymbolFace(value: unknown, path: string): ValidationResult {
+  const issues: ValidationIssue[] = []
+
+  if (!isRecord(value)) {
+    return createValidationResult([{ path, message: 'Symbol face must be an object.' }])
+  }
+
+  if (value.type === 'icon') {
+    addNonEmptyStringIssue(issues, value.symbol, `${path}.symbol`, 'Icon symbol is required.')
+    addNonEmptyStringIssue(issues, value.label, `${path}.label`, 'Icon label is required.')
+  } else if (value.type === 'letter') {
+    if (typeof value.value !== 'string' || !/^[A-ZÄÖÜß]$/.test(value.value)) {
+      issues.push({ path: `${path}.value`, message: 'Letter face must be one supported letter.' })
+    }
+  } else if (value.type === 'number') {
+    if (!isIntegerInRange(value.value, 0, 100)) {
+      issues.push({ path: `${path}.value`, message: 'Number face must be 0 to 100.' })
+    }
+    if (typeof value.countsTowardTotal !== 'boolean') {
+      issues.push({ path: `${path}.countsTowardTotal`, message: 'Number face count flag is required.' })
+    }
+  } else if (value.type === 'color') {
+    addNonEmptyStringIssue(issues, value.value, `${path}.value`, 'Color value is required.')
+    addNonEmptyStringIssue(issues, value.label, `${path}.label`, 'Color label is required.')
+  } else {
+    issues.push({ path: `${path}.type`, message: 'Symbol face type is not supported.' })
   }
 
   return createValidationResult(issues)
@@ -356,6 +442,7 @@ export function normalizeDiceSet(value: unknown): DiceSet | null {
     diceColor: typeof value.diceColor === 'string' ? value.diceColor : '',
     pipColor: typeof value.pipColor === 'string' ? value.pipColor : '',
     modifier: normalizeDiceModifier(value.modifier) as DiceModifier,
+    symbolDice: normalizeSymbolDice(value.symbolDice) as SymbolDieDefinition[],
   }
 }
 

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { copy } from '../../content/en'
 import type { SetHistoryEntry } from '../../domain/types/history'
+import { SymbolFaceView } from './SymbolFaceView'
 
 interface SetHistoryDialogProps {
   setName: string
@@ -39,7 +40,11 @@ export function SetHistoryDialog({
             {entries.map((entry) => (
               <li key={entry.id}>
                 <div>
-                  <strong>{copy.play.history.total(entry.total)}</strong>
+                  <strong>
+                    {entry.total === null
+                      ? copy.play.history.noTotal
+                      : copy.play.history.total(entry.total)}
+                  </strong>
                   <span>
                     {entry.lockedDiceCounting === 'include'
                       ? copy.play.history.included
@@ -52,7 +57,9 @@ export function SetHistoryDialog({
                 <div className="history-dice-row">
                   {entry.diceResults.map((die, index) => (
                     <span key={index} className="history-die">
-                      {die.value === 0 ? '—' : die.value}
+                      {die.symbolFace !== undefined ? (
+                        <SymbolFaceView face={die.symbolFace} />
+                      ) : die.value === 0 ? '—' : die.value}
                       {die.mode === 'locked' ? <em>X</em> : null}
                       {die.mode === 'modifier-active' ? (
                         <em>

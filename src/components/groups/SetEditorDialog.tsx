@@ -9,6 +9,7 @@ import {
   createSetInputFromSet,
   type SetInput,
 } from '../../domain/utils/setFactory'
+import { SymbolDiceSetupDialog } from './SymbolDiceSetupDialog'
 
 interface SetEditorDialogProps {
   set: DiceSet | null
@@ -23,6 +24,7 @@ interface SetEditorErrors {
   diceColor?: string
   pipColor?: string
   modifierValue?: string
+  symbolDice?: string
 }
 
 export function SetEditorDialog({
@@ -35,6 +37,7 @@ export function SetEditorDialog({
     set ? createSetInputFromSet(set) : createEmptySetInput(),
   )
   const [errors, setErrors] = useState<SetEditorErrors>({})
+  const [isSymbolSetupOpen, setIsSymbolSetupOpen] = useState(false)
   const hasLowContrast = !hasReadableColorContrast(input.pipColor, input.diceColor)
 
   function updateInput<Key extends keyof SetInput>(
@@ -85,7 +88,7 @@ export function SetEditorDialog({
             <span>{copy.groupEditor.setDialog.fields.diceCount}</span>
             <input
               type="number"
-              min={1}
+              min={0}
               max={APP_LIMITS.maxDicePerSet}
               value={input.diceCount}
               aria-describedby={errors.diceCount ? 'dice-count-error' : undefined}
@@ -116,6 +119,17 @@ export function SetEditorDialog({
               </small>
             ) : null}
           </label>
+
+          <div className="field">
+            <span>{copy.groupEditor.setDialog.fields.symbolDice}</span>
+            <button className="button-link" type="button" onClick={() => setIsSymbolSetupOpen(true)}>
+              {copy.groupEditor.setDialog.fields.configureSymbolDice}
+            </button>
+            <small>{copy.groupEditor.setDialog.symbolDiceSummary(input.symbolDice.length)}</small>
+            {errors.symbolDice ? (
+              <small className="field-error">{errors.symbolDice}</small>
+            ) : null}
+          </div>
 
           <div className="field field--color">
             <span id="dice-color-label">{copy.groupEditor.setDialog.fields.diceColor}</span>
@@ -243,6 +257,18 @@ export function SetEditorDialog({
             {copy.groupEditor.setDialog.save}
           </button>
         </div>
+
+        {isSymbolSetupOpen ? (
+          <SymbolDiceSetupDialog
+            numericDiceCount={input.diceCount}
+            symbolDice={input.symbolDice}
+            onCancel={() => setIsSymbolSetupOpen(false)}
+            onSave={(symbolDice) => {
+              updateInput('symbolDice', symbolDice)
+              setIsSymbolSetupOpen(false)
+            }}
+          />
+        ) : null}
       </section>
     </div>
   )
@@ -253,7 +279,7 @@ function validateInput(input: SetInput): SetEditorErrors {
 
   if (
     !Number.isInteger(input.diceCount) ||
-    input.diceCount < 1 ||
+    input.diceCount < 0 ||
     input.diceCount > APP_LIMITS.maxDicePerSet
   ) {
     errors.diceCount = copy.groupEditor.setDialog.errors.diceCount(
@@ -261,15 +287,27 @@ function validateInput(input: SetInput): SetEditorErrors {
     )
   }
 
-  if (
+  if (input.diceCount > 0 && (
     !Number.isInteger(input.sides) ||
     input.sides < APP_LIMITS.minSidesPerDie ||
     input.sides > APP_LIMITS.maxSidesPerDie
-  ) {
+  )) {
     errors.sides = copy.groupEditor.setDialog.errors.sides(
       APP_LIMITS.minSidesPerDie,
       APP_LIMITS.maxSidesPerDie,
     )
+  }
+
+  if (input.diceCount + input.symbolDice.length < 1) {
+    errors.diceCount = copy.groupEditor.setDialog.errors.totalDice
+  }
+
+  if (input.diceCount + input.symbolDice.length > APP_LIMITS.maxDicePerSet) {
+    errors.symbolDice = copy.groupEditor.setDialog.errors.totalDiceMax(APP_LIMITS.maxDicePerSet)
+  }
+
+  if (input.symbolDice.some((die) => die.faces.length < 2)) {
+    errors.symbolDice = copy.groupEditor.setDialog.errors.symbolDice
   }
 
   if (input.diceColor.trim() === '') {

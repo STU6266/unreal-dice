@@ -4,6 +4,7 @@ import {
   mapSimpleQuickStartTemplate,
   mapSimpleQuickStartTemplates,
 } from '../domain/utils/simpleQuickStartTemplateMapper'
+import { QUICK_START_TEMPLATES } from '../domain/data/quickStartTemplates'
 
 describe('simpleQuickStartTemplateMapper', () => {
   it('maps a simple template to a Quick Start group', () => {
@@ -139,5 +140,51 @@ describe('simpleQuickStartTemplateMapper', () => {
     })
 
     expect(template).toBeNull()
+  })
+
+  it('maps custom symbol templates', () => {
+    const template = mapSimpleQuickStartTemplate({
+      name: 'Symbol Test',
+      sets: [
+        {
+          name: 'Symbols',
+          dice: 0,
+          sides: 6,
+          symbolDice: [
+            {
+              faces: [
+                { type: 'letter', value: 'A' },
+                { type: 'color', value: '#dc2626', label: 'Red' },
+              ],
+            },
+          ],
+        },
+      ],
+    })
+
+    expect(template?.sets[0]?.diceCount).toBe(0)
+    expect(template?.sets[0]?.symbolDice[0]?.faces).toHaveLength(2)
+  })
+
+  it('skips invalid symbol templates', () => {
+    const template = mapSimpleQuickStartTemplate({
+      name: 'Broken Symbol',
+      sets: [
+        {
+          name: 'Symbols',
+          dice: 0,
+          sides: 6,
+          symbolDice: [{ faces: [{ type: 'letter', value: 'A' }] }],
+        },
+      ],
+    })
+
+    expect(template).toBeNull()
+  })
+
+  it('includes Dice Poker as a code-managed Quick Start template', () => {
+    const dicePoker = QUICK_START_TEMPLATES.find((template) => template.name === 'Dice Poker')
+
+    expect(dicePoker?.sets[0]?.symbolDice).toHaveLength(5)
   })
 })

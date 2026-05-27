@@ -9,6 +9,45 @@ export interface DiceModifier {
   application: ModifierApplication
 }
 
+export type SymbolFaceType = 'icon' | 'letter' | 'number' | 'color'
+
+export interface IconSymbolFace {
+  type: 'icon'
+  id?: string
+  symbol: string
+  label: string
+  category?: string
+  subgroup?: string
+}
+
+export interface LetterSymbolFace {
+  type: 'letter'
+  value: string
+}
+
+export interface NumberSymbolFace {
+  type: 'number'
+  value: number
+  countsTowardTotal: boolean
+}
+
+export interface ColorSymbolFace {
+  type: 'color'
+  value: string
+  label: string
+}
+
+export type SymbolDieFace =
+  | IconSymbolFace
+  | LetterSymbolFace
+  | NumberSymbolFace
+  | ColorSymbolFace
+
+export interface SymbolDieDefinition {
+  id: string
+  faces: SymbolDieFace[]
+}
+
 export interface DiceSet {
   id: string
   name: string
@@ -17,6 +56,7 @@ export interface DiceSet {
   diceColor: string
   pipColor: string
   modifier: DiceModifier
+  symbolDice: SymbolDieDefinition[]
 }
 
 export interface DiceCombo {

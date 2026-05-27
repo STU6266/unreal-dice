@@ -1,9 +1,12 @@
 import { useRef, type CSSProperties, type KeyboardEvent, type PointerEvent } from 'react'
 import type { IndividualDieMode } from '../../domain/types/history'
+import type { SymbolDieFace } from '../../domain/types/dice'
+import { SymbolFaceView } from './SymbolFaceView'
 
 interface IndividualDieProps {
   value: number | null
   sides: number
+  symbolFace?: SymbolDieFace
   diceColor: string
   pipColor: string
   mode: IndividualDieMode
@@ -17,6 +20,7 @@ const MOVE_CANCEL_DISTANCE_PX = 12
 export function IndividualDie({
   value,
   sides,
+  symbolFace,
   diceColor,
   pipColor,
   mode,
@@ -101,7 +105,9 @@ export function IndividualDie({
       onPointerCancel={handlePointerEnd}
       onKeyDown={handleKeyDown}
     >
-      {isUnrolled ? null : sides >= 2 && sides <= 6 ? (
+      {symbolFace !== undefined ? (
+        <SymbolFaceView face={symbolFace} />
+      ) : isUnrolled ? null : sides >= 2 && sides <= 6 ? (
         <span className={`pip-face pip-face--${value}`}>
           {Array.from({ length: value }, (_, index) => (
             <span key={index} className="pip-dot" style={pipStyle} />

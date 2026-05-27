@@ -90,6 +90,47 @@ describe('backupService', () => {
     expect(parsed.backup?.groups[0]?.sets[0]?.modifier.enabled).toBe(false)
   })
 
+  it('backup round-trip preserves symbol dice definitions', () => {
+    const group = createTestGroup({
+      sets: [
+        createTestSet({
+          diceCount: 0,
+          symbolDice: [
+            {
+              id: 'symbol-1',
+              faces: [
+                { type: 'letter', value: 'A' },
+                { type: 'number', value: 5, countsTowardTotal: true },
+              ],
+            },
+          ],
+        }),
+      ],
+    })
+    const parsed = parseBackupJson(JSON.stringify(createBackup([group], 'single-group')))
+
+    expect(parsed.isValid).toBe(true)
+    expect(parsed.backup?.groups[0]?.sets[0]?.symbolDice).toEqual(
+      group.sets[0]?.symbolDice,
+    )
+  })
+
+  it('old backups without symbol dice are accepted with an empty symbol dice list', () => {
+    const backup = createBackup([createTestGroup()], 'single-group')
+    const oldGroup = {
+      ...backup.groups[0],
+      sets: backup.groups[0]?.sets.map((set) => {
+        const oldSet: Partial<typeof set> = { ...set }
+        delete oldSet.symbolDice
+        return oldSet
+      }),
+    }
+    const parsed = parseBackupJson(JSON.stringify({ ...backup, groups: [oldGroup] }))
+
+    expect(parsed.isValid).toBe(true)
+    expect(parsed.backup?.groups[0]?.sets[0]?.symbolDice).toEqual([])
+  })
+
   it('invalid JSON is rejected safely', () => {
     expect(parseBackupJson('{broken').isValid).toBe(false)
   })

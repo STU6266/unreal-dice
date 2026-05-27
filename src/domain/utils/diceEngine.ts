@@ -1,6 +1,6 @@
-import type { DiceSet, LockedDiceCounting } from '../types/dice'
+import type { DiceSet, LockedDiceCounting, SymbolDieDefinition } from '../types/dice'
 import type { DiceGroup } from '../types/groups'
-import type { IndividualDieResult } from '../types/history'
+import type { IndividualDieMode, IndividualDieResult } from '../types/history'
 import type { GroupPlaySession, SetPlayState } from '../types/session'
 import {
   applyModifier,
@@ -8,6 +8,7 @@ import {
   isModifierActiveDie,
   normalizeDieMode,
 } from './modifierUtils'
+import { getSymbolFaceContribution } from './symbolDiceUtils'
 
 export type RandomNumberGenerator = () => number
 
@@ -39,22 +40,39 @@ export function calculateModifiedSetTotal(
   set: DiceSet,
   lockedDiceCounting: LockedDiceCounting,
   setModifierActive: boolean,
-): number {
+): number | null {
+  let hasCountableResult = false
+  let hasVisibleCountableResult = false
   const baseTotal = diceResults.reduce((total, die) => {
+    const contribution = getDieContribution(die)
+    if (contribution !== null) {
+      hasVisibleCountableResult = true
+    }
+
     if (isLockedDie(die) && lockedDiceCounting === 'exclude') {
       return total
     }
+
+    if (contribution === null) {
+      return total
+    }
+
+    hasCountableResult = true
 
     if (
       set.modifier.enabled &&
       set.modifier.application === 'each-die' &&
       isModifierActiveDie(die)
     ) {
-      return total + applyModifier(die.value, set.modifier)
+      return total + applyModifier(contribution, set.modifier)
     }
 
-    return total + die.value
+    return total + contribution
   }, 0)
+
+  if (!hasCountableResult && !hasVisibleCountableResult) {
+    return null
+  }
 
   if (
     set.modifier.enabled &&
@@ -74,11 +92,12 @@ export function rollSet(
   random: RandomNumberGenerator = Math.random,
 ): SetPlayState {
   const previousResults = previousState?.diceResults ?? []
+  const totalDiceCount = set.diceCount + set.symbolDice.length
   const setModifierActive =
     set.modifier.enabled && set.modifier.application === 'set-total'
       ? (previousState?.setModifierActive ?? true)
       : false
-  const diceResults: IndividualDieResult[] = Array.from({ length: set.diceCount }, (_, index) => {
+  const numericResults: IndividualDieResult[] = Array.from({ length: set.diceCount }, (_, index) => {
     const previousDie = previousResults[index]
     const previousMode = normalizeDieMode(previousDie)
     const shouldStartModifierActive =
@@ -92,6 +111,7 @@ export function rollSet(
 
     return {
       value: rollDie(set.sides, random),
+      resultType: 'numeric',
       mode:
         set.modifier.enabled && set.modifier.application === 'each-die'
           ? previousMode === 'normal' && !shouldStartModifierActive
@@ -100,6 +120,28 @@ export function rollSet(
           : 'normal',
     }
   })
+  const symbolResults: IndividualDieResult[] = set.symbolDice.map((symbolDie, symbolIndex) => {
+    const resultIndex = set.diceCount + symbolIndex
+    const previousDie = previousResults[resultIndex]
+    const previousMode = normalizeDieMode(previousDie)
+    const shouldStartModifierActive =
+      set.modifier.enabled &&
+      set.modifier.application === 'each-die' &&
+      previousDie === undefined
+
+    if (previousMode === 'locked' && previousDie !== undefined) {
+      return { ...previousDie, mode: 'locked' }
+    }
+
+    const nextMode: IndividualDieMode = set.modifier.enabled && set.modifier.application === 'each-die'
+      ? previousMode === 'normal' && !shouldStartModifierActive
+        ? 'normal'
+        : 'modifier-active'
+      : 'normal'
+
+    return rollSymbolDie(symbolDie, random, nextMode)
+  })
+  const diceResults = [...numericResults, ...symbolResults].slice(0, totalDiceCount)
   const total = calculateModifiedSetTotal(
     diceResults,
     set,
@@ -122,6 +164,7 @@ export function rollAllSets(
   random: RandomNumberGenerator = Math.random,
 ): GroupPlaySession {
   let combinedTotal = 0
+  let hasAnyTotal = false
   const setStates = { ...session.setStates }
 
   group.sets.forEach((set) => {
@@ -132,13 +175,16 @@ export function rollAllSets(
       random,
     )
     setStates[set.id] = nextState
-    combinedTotal += nextState.total ?? 0
+    if (nextState.total !== null) {
+      combinedTotal += nextState.total
+      hasAnyTotal = true
+    }
   })
 
   return {
     ...session,
     setStates,
-    lastRollAllTotal: combinedTotal,
+    lastRollAllTotal: hasAnyTotal ? combinedTotal : null,
   }
 }
 
@@ -154,6 +200,7 @@ export function rollComboSets(
   }
 
   let comboTotal = 0
+  let hasAnyTotal = false
   const setStates = { ...session.setStates }
 
   combo.setIds.forEach((setId) => {
@@ -169,7 +216,10 @@ export function rollComboSets(
       random,
     )
     setStates[set.id] = nextState
-    comboTotal += nextState.total ?? 0
+    if (nextState.total !== null) {
+      comboTotal += nextState.total
+      hasAnyTotal = true
+    }
   })
 
   return {
@@ -177,7 +227,33 @@ export function rollComboSets(
     setStates,
     comboTotals: {
       ...session.comboTotals,
-      [comboId]: comboTotal,
+      [comboId]: hasAnyTotal ? comboTotal : null,
     },
+  }
+}
+
+export function getDieContribution(die: IndividualDieResult): number | null {
+  if (die.resultType === 'symbol') {
+    return getSymbolFaceContribution(die.symbolFace)
+  }
+
+  return die.value
+}
+
+function rollSymbolDie(
+  symbolDie: SymbolDieDefinition,
+  random: RandomNumberGenerator,
+  mode: IndividualDieResult['mode'],
+): IndividualDieResult {
+  const faceIndex = Math.floor(random() * symbolDie.faces.length)
+  const face = symbolDie.faces[Math.min(faceIndex, symbolDie.faces.length - 1)]
+  const contribution = getSymbolFaceContribution(face)
+
+  return {
+    value: contribution ?? 0,
+    mode,
+    resultType: 'symbol',
+    symbolDieId: symbolDie.id,
+    symbolFace: face === undefined ? undefined : { ...face },
   }
 }
