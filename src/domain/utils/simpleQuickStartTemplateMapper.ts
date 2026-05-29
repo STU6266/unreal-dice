@@ -11,7 +11,7 @@ import type {
   SymbolDieDefinition,
 } from '../types/dice'
 import { createDisabledModifier, isValidDiceModifier } from './modifierUtils'
-import { normalizeSymbolDice } from './symbolDiceUtils'
+import { MAX_SYMBOL_FACES_PER_DIE, normalizeSymbolDice } from './symbolDiceUtils'
 
 export interface SimpleQuickStartTemplate {
   name: string
@@ -169,7 +169,7 @@ function normalizeSimpleSymbolDice(
   )
 
   return normalized.length === symbolDice.length &&
-    normalized.every((die) => die.faces.length >= 2 && die.faces.length <= 30)
+    normalized.every((die) => die.faces.length >= 2 && die.faces.length <= MAX_SYMBOL_FACES_PER_DIE)
     ? normalized
     : null
 }

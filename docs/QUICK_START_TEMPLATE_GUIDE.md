@@ -71,7 +71,7 @@ If omitted, templates use `"exclude"`.
 - Numeric dice per set: 0 to 30
 - Sides per die: 2 to 100
 - Total numeric plus symbol dice per set: 1 to 30
-- Faces per symbol die: 2 to 30
+- Faces per symbol die: 2 to 50
 - Sets per group: up to 40
 - Combos per group: up to 20
 - Sets inside one combo: up to 20

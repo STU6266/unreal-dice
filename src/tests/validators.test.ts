@@ -126,12 +126,25 @@ describe('validators', () => {
       { type: 'letter', value: 'A' },
       { type: 'letter', value: 'A' },
     ] as const
+    const maxFaces = Array.from({ length: 50 }, (_, index) => ({
+      type: 'number' as const,
+      value: index,
+      countsTowardTotal: false,
+    }))
 
     expect(
       validateDiceSet(
         createTestSet({
           diceCount: 0,
           symbolDice: [{ id: 'symbol-1', faces: [...duplicateFaces] }],
+        }),
+      ).isValid,
+    ).toBe(true)
+    expect(
+      validateDiceSet(
+        createTestSet({
+          diceCount: 0,
+          symbolDice: [{ id: 'symbol-1', faces: maxFaces }],
         }),
       ).isValid,
     ).toBe(true)

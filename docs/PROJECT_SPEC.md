@@ -367,7 +367,7 @@ Each set contains:
 
 Version 1.3 supports symbol dice inside sets. A set can contain numeric dice, symbol dice, or both.
 
-Symbol dice have 2 to 30 custom faces. Duplicate faces are allowed for weighted outcomes.
+Symbol dice have 2 to 50 custom faces. Duplicate faces are allowed for weighted outcomes.
 
 Supported symbol faces:
 

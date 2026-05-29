@@ -1,7 +1,7 @@
 import { APP_LIMITS } from '../constants/limits'
 import type { SymbolDieDefinition, SymbolDieFace } from '../types/dice'
 
-export const MAX_SYMBOL_FACES_PER_DIE = 30
+export const MAX_SYMBOL_FACES_PER_DIE = 50
 
 export function createEmptySymbolDie(idFactory: () => string = createRandomId): SymbolDieDefinition {
   return { id: idFactory(), faces: [] }
